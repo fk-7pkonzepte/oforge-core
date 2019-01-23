@@ -23,10 +23,10 @@ class RouteMiddleware {
 	public function __invoke( $request, $response, $next ) {
 		Oforge()->View()->assign( [
 			'meta' => [
-				'route'             => $this->endpoint->toArray(),
-				'language'          => $this->endpoint->getLanguageID(),
-				'controller_method' => $this->endpoint->getController(),
-				'asset_scope'       => $this->endpoint->getAssetScope(),
+                'route'             => $this->endpoint->toArray(),
+                'language'          => $this->endpoint->getLanguageId(),
+                'controller_method' => $this->endpoint->getController(),
+                'asset_scope'       => $this->endpoint->getAssetScope(),
 			],
 		] );
 

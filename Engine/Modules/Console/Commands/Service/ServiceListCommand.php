@@ -48,16 +48,16 @@ class ServiceListCommand extends AbstractCommand {
 
                     $classMethods = get_class_methods($service);
                     foreach ($classMethods as $classMethod) {
-                        if (StringHelper::startsWith($classMethod, "__")) {
+                        if (StringHelper::startsWith($classMethod, '__')) {
                             continue;
                         }
                         $reflector  = new \ReflectionClass($service);
                         $comment    = explode("\n", $reflector->getMethod($classMethod)->getDocComment());
-                        $methodText = "";
+                        $methodText = '';
                         if (count($comment) > 1) {
-                            if (!StringHelper::contains($comment[1], "@param")
-                                && !StringHelper::contains($comment[1], "@throws")
-                                && !StringHelper::contains($comment[1], "@return")) {
+                            if (!StringHelper::contains($comment[1], '@param')
+                                && !StringHelper::contains($comment[1], '@throws')
+                                && !StringHelper::contains($comment[1], '@return')) {
                                 $methodText = strtr($comment[1], [
                                     '*'  => '',
                                     "\n" => '',

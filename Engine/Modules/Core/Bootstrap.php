@@ -18,39 +18,49 @@ use Oforge\Engine\Modules\Core\Services\PingService;
 use Oforge\Engine\Modules\Core\Services\PluginAccessService;
 use Oforge\Engine\Modules\Core\Services\PluginStateService;
 
+/**
+ * Class Bootstrap
+ *
+ * @package Oforge\Engine\Modules\Core
+ */
 class Bootstrap extends AbstractBootstrap {
-	public function __construct() {
-		$this->models = [
-			Module::class,
-			Element::class,
-			Value::class,
-			Plugin::class,
-			Middleware::class,
-			Endpoint::class,
-			KeyValue::class,
-		];
 
-		$this->services = [
-			'plugin.state'   => PluginStateService::class,
-			'plugin.access'  => PluginAccessService::class,
-			'endpoints'      => EndpointService::class,
-			'config'         => ConfigService::class,
-			'middleware'     => MiddlewareService::class,
-			'store.keyvalue' => KeyValueStoreService::class,
-			'ping'           => PingService::class,
-		];
+    public function __construct() {
+        $this->models = [
+            Module::class,
+            Element::class,
+            Value::class,
+            Plugin::class,
+            Middleware::class,
+            Endpoint::class,
+            KeyValue::class,
+        ];
 
-		$this->order = 0;
-	}
+        $this->services = [
+            'config'         => ConfigService::class,
+            'endpoint'       => EndpointService::class,
+            'middleware'     => MiddlewareService::class,
+            'ping'           => PingService::class,
+            'plugin.access'  => PluginAccessService::class,
+            'plugin.state'   => PluginStateService::class,
+            'store.keyvalue' => KeyValueStoreService::class,
+        ];
 
-	/**
-	 *
-	 */
-	public function install() {
-		/**
-		 * @var ConfigService $configService
-		 */
-		$configService = Oforge()->Services()->get( 'config' );
-		$configService->update( [ 'name' => 'system_debug', 'label' => 'Debug aktivieren', 'type' => 'boolean', 'default' => true, 'group' => 'system' ] );
-	}
+        $this->order = 0;
+    }
+
+    /**
+     *
+     */
+    public function install() {
+        /** @var ConfigService $configService */
+        $configService = Oforge()->Services()->get('config');
+        $configService->update([
+            'name'    => 'system_debug',
+            'label'   => 'Debug aktivieren',
+            'type'    => 'boolean',
+            'default' => true,
+            'group'   => 'system',
+        ]);
+    }
 }

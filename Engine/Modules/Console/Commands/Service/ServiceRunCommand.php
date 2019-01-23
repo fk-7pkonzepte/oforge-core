@@ -58,13 +58,13 @@ class ServiceRunCommand extends AbstractCommand {
     public function validateOperandServiceNameFunction($value) {
         $invalid = (strpos($value, ':') === false);
         if ($invalid) {
-            $this->validationMessage['ServiceNameFunction'] = 'Operand ServiceNameFunction "' . $value . '" has wrong format!';
+            $this->validationMessage['ServiceNameFunction'] = "Operand ServiceNameFunction '$value' has wrong format!";
         } else {
             $callable = $this->getServiceFunctionCallable($value);
             if ($callable === false) {
                 $invalid = true;
 
-                $this->validationMessage['ServiceNameFunction'] = 'No Service function "' . $value . '" found!';
+                $this->validationMessage['ServiceNameFunction'] = "No Service function '$value' found!";
             }
         }
 
