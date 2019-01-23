@@ -2,14 +2,13 @@
 
 namespace Oforge\Engine\Modules\Core\Manager\Modules;
 
-use Noodlehaus\Exception;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Bootstrap;
 use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
 use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallModuleException;
 use Oforge\Engine\Modules\Core\Helper\Helper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Models\Module\Module;
+use Oforge\Engine\Modules\Core\Statics;
 
 class ModuleManager
 {
@@ -43,7 +42,7 @@ class ModuleManager
      */
     public function init()
     {
-        $files = Helper::getBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::ENGINE_DIR);
+        $files = Helper::getBootstrapFiles(ROOT_PATH . Statics::ENGINE_DIR);
 
         // init core module
         $this->initCoreModule(Bootstrap::class);

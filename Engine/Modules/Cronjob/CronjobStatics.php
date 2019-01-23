@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\Modules\Cronjob;
 
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Cronjob settings constants
@@ -11,11 +11,11 @@ use Oforge\Engine\Modules\Core\Helper\Statics;
  */
 class CronjobStatics {
     /**
-     * Relative path of cronjob file logs folder.
+     * Relative path: /var/cronjob/
      */
-    public const CRONJOB_LOGS_DIR = DIRECTORY_SEPARATOR . Statics::VAR_DIR . DIRECTORY_SEPARATOR . 'cronjob';
+    public const CRONJOB_LOGS_DIR = Statics::VAR_DIR . DIRECTORY_SEPARATOR . 'cronjob';
     /**
-     * Absolute path of cronjob file logs folder.
+     * Absolute path: ROOT/var/cronjob/
      */
     public const CRONJOB_LOGS_DIR_ABS = ROOT_PATH . self::CRONJOB_LOGS_DIR;
     /**

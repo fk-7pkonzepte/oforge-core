@@ -10,7 +10,7 @@ namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
 use Leafo\ScssPhp\Compiler;
 use MatthiasMullie\Minify\CSS;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 class CssAssetService extends BaseAssetService
 {
@@ -52,11 +52,11 @@ class CssAssetService extends BaseAssetService
 
         //iterate over all plugins, current theme and base theme
         foreach ($dirs as $dir) {
-            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR  . DIRECTORY_SEPARATOR . Statics::ASSETS_SCSS . DIRECTORY_SEPARATOR;
-            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_ALL_SCSS)) {
+            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR . Statics::ASSETS_SCSS_DIR_NAME . DIRECTORY_SEPARATOR;
+            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_ALL_SCSS_NAME)) {
                 $scss = new Compiler();
                 $scss->addImportPath($folder);
-                $result .= $scss->compile('@import "' . Statics::ASSETS_ALL_SCSS . '";');
+                $result .= $scss->compile('@import "' . Statics::ASSETS_ALL_SCSS_NAME . '";');
             }
         }
 

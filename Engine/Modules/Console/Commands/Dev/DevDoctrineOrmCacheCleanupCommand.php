@@ -6,7 +6,7 @@ use Monolog\Logger;
 use Oforge\Engine\Modules\Console\Abstracts\AbstractCommand;
 use Oforge\Engine\Modules\Console\Lib\Input;
 use Oforge\Engine\Modules\Core\Helper\FileSystemHelper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Class DevDoctrineOrmCacheCleanupCommand

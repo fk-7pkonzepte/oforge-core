@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
 use MatthiasMullie\Minify\JS;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 class JsAssetService extends BaseAssetService
 {
@@ -49,10 +49,10 @@ class JsAssetService extends BaseAssetService
 
         //iterate over all plugins, current theme and base theme
         foreach ($dirs as $dir) {
-            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR  . DIRECTORY_SEPARATOR . Statics::ASSETS_JS . DIRECTORY_SEPARATOR;
-            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_IMPORT_JS)) {
+            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR . Statics::ASSETS_JS_DIR_NAME . DIRECTORY_SEPARATOR;
+            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_IMPORT_JS_FILE_NAME)) {
 
-                if ($file = fopen($folder . Statics::ASSETS_IMPORT_JS, "r")) {
+                if ($file = fopen($folder . Statics::ASSETS_IMPORT_JS_FILE_NAME, "r")) {
                     while(!feof($file)) {
                         $line = trim(fgets($file));
 

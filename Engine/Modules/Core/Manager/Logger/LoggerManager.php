@@ -7,7 +7,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Oforge\Engine\Modules\Core\Exceptions\LoggerAlreadyExistException;
 use Oforge\Engine\Modules\Core\Helper\ArrayHelper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Manager for logger.

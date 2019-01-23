@@ -8,7 +8,7 @@
 
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 class StaticAssetService extends BaseAssetService
 {
@@ -33,7 +33,7 @@ class StaticAssetService extends BaseAssetService
         //iterate over all plugins, current theme and base theme
         foreach ($dirs as $dir) {
 
-            $baseFolder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR . DIRECTORY_SEPARATOR;
+            $baseFolder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR;
 
             foreach ($copyFolders as $copy) {
                 $folder = $baseFolder . $copy;

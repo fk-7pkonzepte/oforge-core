@@ -11,11 +11,8 @@ declare(strict_types=1);
 namespace Tests\Auth\Services;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Oforge\Engine\Modules\Auth\Models\User\BackendUser;
-use Oforge\Engine\Modules\Auth\Models\User\User;
 use Oforge\Engine\Modules\Auth\Services\BackendLoginService;
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Tests\TestCase;
 
 final class BackendLoginServiceTest extends TestCase

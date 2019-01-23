@@ -1,6 +1,6 @@
 <?php 
 use Monolog\Logger;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 return [
     'mode' => "development", // production|development
@@ -8,12 +8,10 @@ return [
     'logger' => [
         [
             'name' => 'system',
-            'path' => ROOT_PATH . '/var/logs/system.log',
             'level' => Logger::DEBUG,
         ],
         [
             'name' => 'plugins',
-            'path' => ROOT_PATH . '/var/logs/plugins.log',
             'level' => Logger::DEBUG,
         ]
     ],
@@ -21,9 +19,8 @@ return [
     'db' => [
         // if true, metadata caching is forcefully disabled
         'dev_mode' => true,
-        
-        // path where the compiled metadata info will be cached
-        // make sure the path exists and it is writable
+
+        // path where the compiled metadata info will be cached. make sure the path exists and it is writable
         'cache_dir' => ROOT_PATH . Statics::DB_CACHE_DIR,
 
         // you should add any other path containing annotated entity classes

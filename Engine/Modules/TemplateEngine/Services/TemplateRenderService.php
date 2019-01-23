@@ -8,16 +8,16 @@
 
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
+use Oforge\Engine\Modules\Core\Statics;
 use Oforge\Engine\Modules\TemplateEngine\Models\Template\Template;
 use Oforge\Engine\Modules\TemplateEngine\Twig\CustomTwig;
+use Oforge\Engine\Modules\TemplateEngine\Twig\TwigOforgeDebugExtension;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Twig_Extension_Debug;
 use Twig_Loader_Filesystem;
-use Oforge\Engine\Modules\TemplateEngine\Twig\TwigOforgeDebugExtension;
 
 class TemplateRenderService
 {
@@ -148,7 +148,7 @@ class TemplateRenderService
     public function View()
     {
         $activeTemplate = $this->getActiveTemplate();
-        $templatePath = DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR . DIRECTORY_SEPARATOR . $activeTemplate;
+        $templatePath = DIRECTORY_SEPARATOR . Statics::THEME_DIR_NAME . DIRECTORY_SEPARATOR . $activeTemplate;
 
         if (!$this->view) {
 
@@ -165,7 +165,7 @@ class TemplateRenderService
             $paths["parent"] = [];
 
             foreach ($plugins as $plugin) {
-                $viewsDir = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin->getName() . DIRECTORY_SEPARATOR . Statics::VIEW_DIR;
+                $viewsDir = ROOT_PATH . Statics::PLUGINS_DIR . DIRECTORY_SEPARATOR . $plugin->getName() . DIRECTORY_SEPARATOR . Statics::VIEW_DIR_NAME;
 
                 if (file_exists($viewsDir)) {
                     array_push($paths["parent"], $viewsDir);

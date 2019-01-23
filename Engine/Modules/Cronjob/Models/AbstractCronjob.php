@@ -5,7 +5,7 @@ namespace Oforge\Engine\Modules\Cronjob\Models;
 use Doctrine\ORM\Mapping as ORM;
 use Monolog\Logger;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Class Cronjob
