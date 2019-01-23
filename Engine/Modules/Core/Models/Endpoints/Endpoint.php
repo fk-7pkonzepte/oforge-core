@@ -6,195 +6,184 @@ use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
 
 /**
- * @ORM\Table(name="oforge_core_endpoints")
  * @ORM\Entity
+ * @ORM\Table(name="oforge_core_endpoints")
  */
 class Endpoint extends AbstractModel {
-	/**
-	 * @var int
-	 * @ORM\Column(name="id", type="integer", nullable=false)
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
-	/**
-	 * @var bool
-	 * @ORM\Column(name="active", type="boolean", nullable=false, options={"default":false})
-	 */
-	private $active = false;
-	/**
-	 * @var string
-	 * @ORM\Column(name="name", type="string", nullable=false)
-	 */
-	private $name;
-	/**
-	 * @var string
-	 * @ORM\Column(name="path", type="string", nullable=false)
-	 */
-	private $path;
-	/**
-	 * @var string
-	 * @ORM\Column(name="controller", type="string", nullable=false)
-	 */
-	private $controller;
-	/**
-	 * @var string
-	 * @ORM\Column(name="http", type="string", nullable=false, options={"default":"any"})
-	 */
-	private $httpMethod = 'any';
-	/**
-	 * @var string
-	 * @ORM\Column(name="asset_scope", type="string", nullable=true, options={"default":"frontend"})
-	 */
-	private $assetScope = 'frontend';
-	/**
-	 * @var string
-	 * @ORM\Column(name="language_id", type="string", nullable=false, options={"default":"de"})
-	 */
-	private $languageID = 'de';
+    /**
+     * @var int $id
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+    /**
+     * @var bool $active
+     * @ORM\Column(name="active", type="boolean", nullable=false, options={"default":false})
+     */
+    private $active = false;
+    /**
+     * @var string $name
+     * @ORM\Column(name="name", type="string", nullable=false)
+     */
+    private $name;
+    /**
+     * @var string $path
+     * @ORM\Column(name="path", type="string", nullable=false)
+     */
+    private $path;
+    /**
+     * @var string $controller
+     * @ORM\Column(name="controller", type="string", nullable=false)
+     */
+    private $controller;
+    /**
+     * @var string $httpMethod
+     * @ORM\Column(name="http", type="string", nullable=false, options={"default":"any"})
+     */
+    private $httpMethod = 'any';
+    /**
+     * @var string $assetScope
+     * @ORM\Column(name="asset_scope", type="string", nullable=true, options={"default":"frontend"})
+     */
+    private $assetScope = 'frontend';
+    /**
+     * @var string
+     * @ORM\Column(name="language_id", type="string", nullable=false, options={"default":"de"})
+     */
+    private $languageId = 'de';
 
-	/**
-	 * @return int
-	 */
-	public function getId() : int {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId() : int {
+        return $this->id;
+    }
 
-	/**
-	 * @param int $id
-	 *
-	 * @return Endpoint
-	 */
-	public function setId( int $id ) : Endpoint {
-		$this->id = $id;
+    /**
+     * @return bool
+     */
+    public function isActive() : bool {
+        return $this->active;
+    }
 
-		return $this;
-	}
+    /**
+     * @param bool $active
+     *
+     * @return Endpoint
+     */
+    public function setActive(bool $active) : Endpoint {
+        $this->active = $active;
 
-	/**
-	 * @return bool
-	 */
-	public function isActive() : bool {
-		return $this->active;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param bool $active
-	 *
-	 * @return Endpoint
-	 */
-	public function setActive( bool $active ) : Endpoint {
-		$this->active = $active;
+    /**
+     * @return string
+     */
+    public function getName() : string {
+        return $this->name;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $name
+     *
+     * @return Endpoint
+     */
+    public function setName(string $name) : Endpoint {
+        $this->name = $name;
 
-	/**
-	 * @return string
-	 */
-	public function getName() : string {
-		return $this->name;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $name
-	 *
-	 * @return Endpoint
-	 */
-	public function setName( string $name ) : Endpoint {
-		$this->name = $name;
+    /**
+     * @return string
+     */
+    public function getPath() : string {
+        return $this->path;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $path
+     *
+     * @return Endpoint
+     */
+    public function setPath(string $path) : Endpoint {
+        $this->path = $path;
 
-	/**
-	 * @return string
-	 */
-	public function getPath() : string {
-		return $this->path;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $path
-	 *
-	 * @return Endpoint
-	 */
-	public function setPath( string $path ) : Endpoint {
-		$this->path = $path;
+    /**
+     * @return string
+     */
+    public function getController() : string {
+        return $this->controller;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $controller
+     *
+     * @return Endpoint
+     */
+    public function setController(string $controller) : Endpoint {
+        $this->controller = $controller;
 
-	/**
-	 * @return string
-	 */
-	public function getController() : string {
-		return $this->controller;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $controller
-	 *
-	 * @return Endpoint
-	 */
-	public function setController( string $controller ) : Endpoint {
-		$this->controller = $controller;
+    /**
+     * @return string
+     */
+    public function getHttpMethod() : string {
+        return $this->httpMethod;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $httpMethod
+     *
+     * @return Endpoint
+     */
+    public function setHttpMethod(string $httpMethod) : Endpoint {
+        $this->httpMethod = $httpMethod;
 
-	/**
-	 * @return string
-	 */
-	public function getHttpMethod() : string {
-		return $this->httpMethod;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $httpMethod
-	 *
-	 * @return Endpoint
-	 */
-	public function setHttpMethod( string $httpMethod ) : Endpoint {
-		$this->httpMethod = $httpMethod;
+    /**
+     * @return string|null
+     */
+    public function getAssetScope() : ?string {
+        return $this->assetScope;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $assetScope
+     *
+     * @return Endpoint
+     */
+    public function setAssetScope(string $assetScope) : Endpoint {
+        $this->assetScope = $assetScope;
 
-	/**
-	 * @return string
-	 */
-	public function getAssetScope() {
-		return $this->assetScope;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $assetScope
-	 *
-	 * @return Endpoint
-	 */
-	public function setAssetScope( string $assetScope ) : Endpoint {
-		$this->assetScope = $assetScope;
+    /**
+     * @return string
+     */
+    public function getLanguageId() : string {
+        return $this->languageId;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $languageId
+     *
+     * @return Endpoint
+     */
+    public function setLanguageId(string $languageId) : Endpoint {
+        $this->languageId = $languageId;
 
-	/**
-	 * @return string
-	 */
-	public function getLanguageID() : string {
-		return $this->languageID;
-	}
-
-	/**
-	 * @param string $languageID
-	 *
-	 * @return Endpoint
-	 */
-	public function setLanguageID( string $languageID ) : Endpoint {
-		$this->languageID = $languageID;
-
-		return $this;
-	}
+        return $this;
+    }
 
 }
