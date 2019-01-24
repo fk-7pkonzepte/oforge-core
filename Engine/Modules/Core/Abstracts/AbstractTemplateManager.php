@@ -1,11 +1,8 @@
 <?php
 /*****************************************************
- *
- *     	OFORGE
+ *        OFORGE
  *      Copyright (c) 7P.konzepte GmbH
- *		License: MIT
- *
- *
+ *        License: MIT
  *                (                           (
  *               ( ,)                        ( ,)
  *              ). ( )                      ). ( )
@@ -27,17 +24,29 @@
  *         ||  |_____|_|_|_|__|_|_|__|_|_|_|_____|  ||
  *      ~ ~^^ @@@@@@@@@@@@@@/=======\@@@@@@@@@@@@@@ ^^~ ~
  *           ^~^~                                ~^~^
- *
- *
- *
  **********************************************************/
+
 namespace Oforge\Engine\Modules\Core\Abstracts;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * Class AbstractTemplateManager
+ *
+ * @package Oforge\Engine\Modules\Core\Abstracts
+ */
 abstract class AbstractTemplateManager extends AbstractInitializer {
-    public abstract function render(Request $request, Response $response, $data);
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param array $data
+     *
+     * @return mixed
+     */
+    abstract public function render(Request $request, Response $response, array $data);
+
 }
 
 
