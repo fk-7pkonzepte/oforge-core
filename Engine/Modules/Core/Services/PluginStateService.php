@@ -24,7 +24,7 @@ class PluginStateService
     private $repo;
     
     public function __construct() {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->repo = $this->em->getRepository(Plugin::class);
     }
     
@@ -48,7 +48,7 @@ class PluginStateService
         if (isset($plugin) && $plugin->getActive()) {
             $instance = Helper::getBootstrapInstance($pluginName);
             if (isset($instance)) {
-                Oforge()->DB()->initSchema($instance->getModels());
+                Oforge()->DB()->initModelSchemata($instance->getModels());
                 $services = $instance->getServices();
                 Oforge()->Services()->register($services);
                 $endpoints = $instance->getEndpoints();
@@ -56,7 +56,7 @@ class PluginStateService
                 /**
                  * @var $endpointService EndpointService
                  */
-                $endpointService = Oforge()->Services()->get("endpoints");
+                $endpointService = Oforge()->Services()->get('endpoint');
                 $endpointService->register($endpoints);
             }
         }
@@ -125,7 +125,7 @@ class PluginStateService
         if (isset($instance)) {
             $models = $instance->getModels();
             if (sizeof($models) > 0) {
-                Oforge()->DB()->initSchema($models);
+                Oforge()->DB()->initModelSchemata($models);
             }
             $services = $instance->getServices();
             Oforge()->Services()->register($services);

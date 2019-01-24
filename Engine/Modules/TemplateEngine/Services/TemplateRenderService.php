@@ -148,7 +148,7 @@ class TemplateRenderService
     public function View()
     {
         $activeTemplate = $this->getActiveTemplate();
-        $templatePath = DIRECTORY_SEPARATOR . Statics::THEME_DIR_NAME . DIRECTORY_SEPARATOR . $activeTemplate;
+        $templatePath = DIRECTORY_SEPARATOR . Statics::THEMES_DIR_NAME . DIRECTORY_SEPARATOR . $activeTemplate;
 
         if (!$this->view) {
 
@@ -204,7 +204,7 @@ class TemplateRenderService
      */
     public function getActiveTemplate()
     {
-        $em = Oforge()->DB()->getManager();
+        $em = Oforge()->DB()->getEntityManager();
         $repo = $em->getRepository(Template::class);
         /**
          * @var $template Template

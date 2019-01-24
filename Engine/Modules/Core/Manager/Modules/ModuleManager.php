@@ -19,7 +19,7 @@ class ModuleManager
 
     protected function __construct()
     {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->moduleRepository = $this->em->getRepository(Module::class);
     }
 
@@ -140,7 +140,7 @@ class ModuleManager
             $instance = new $className();
 
 
-            Oforge()->DB()->initSchema($instance->getModels());
+            Oforge()->DB()->initModelSchemata($instance->getModels());
 
             $services = $instance->getServices();
             Oforge()->Services()->register($services);
@@ -221,7 +221,7 @@ class ModuleManager
              */
             $instance = new $className();
 
-            Oforge()->DB()->initSchema($instance->getModels());
+            Oforge()->DB()->initModelSchemata($instance->getModels());
 
             $services = $instance->getServices();
             Oforge()->Services()->register($services);

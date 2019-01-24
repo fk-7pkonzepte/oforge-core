@@ -95,7 +95,7 @@ class BaseAssetService
         $templateRenderer = Oforge()->Services()->get("template.render");
         $activeTemplate = $templateRenderer->getActiveTemplate();
 
-        $paths = [ROOT_PATH . Statics::THEME_DIR . DIRECTORY_SEPARATOR . "Base"];
+        $paths = [ROOT_PATH . Statics::THEMES_DIR . DIRECTORY_SEPARATOR . "Base"];
 
         /**
          * @var $pluginAccessService PluginAccessService
@@ -115,7 +115,7 @@ class BaseAssetService
             }
         }
 
-        $templatePath = ROOT_PATH .  Statics::THEME_DIR . DIRECTORY_SEPARATOR . $activeTemplate;
+        $templatePath = ROOT_PATH .  Statics::THEMES_DIR . DIRECTORY_SEPARATOR . $activeTemplate;
 
         if (!in_array( $templatePath, $paths)) array_push($paths, $templatePath);
 

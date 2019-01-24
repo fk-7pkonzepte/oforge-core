@@ -24,7 +24,7 @@ class GenericCrudService
      */
     public function __construct()
     {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
     }
 
     public function list($class, $params = [])

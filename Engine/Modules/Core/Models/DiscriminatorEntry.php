@@ -23,7 +23,8 @@ final class DiscriminatorEntry {
     /**
      * @return string|null
      */
-    public function getValue() {
+    public function getValue() : ?string {
         return $this->value;
     }
+
 }

@@ -41,7 +41,7 @@ class PluginManager
         foreach ($pluginFiles as $pluginName => $dir) {
             $pluginService->register($pluginName);
         }
-        $em = Oforge()->DB()->getManager();
+        $em = Oforge()->DB()->getEntityManager();
         $pluginRepository = $em->getRepository(Plugin::class);
 
         //find all plugins order by "order"

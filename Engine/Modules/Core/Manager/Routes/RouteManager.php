@@ -25,7 +25,7 @@ class RouteManager {
 	 * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
 	 */
 	public function init() {
-		$entityManager = Oforge()->DB()->getManager();
+		$entityManager = Oforge()->DB()->getEntityManager();
 		$repository    = $entityManager->getRepository( Endpoint::class );
 
 		/**

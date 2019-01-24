@@ -2,9 +2,14 @@
 
 namespace Oforge\Engine\Modules\Core;
 
+/**
+ * Class Statics
+ *
+ * @package Oforge\Engine\Modules\Core
+ */
 class Statics {
     /**
-     * Default Ordner value for all order properties.
+     * Default order value for all order properties.
      */
     public const DEFAULT_ORDER = 1337;
     /**
@@ -22,7 +27,7 @@ class Statics {
     /**
      * Name of views directory.
      */
-    public const THEME_DIR_NAME = "Themes";
+    public const THEMES_DIR_NAME = "Themes";
     /**
      * Name of root plugins directory.
      */
@@ -52,9 +57,9 @@ class Statics {
      */
     public const PLUGINS_DIR = DIRECTORY_SEPARATOR . 'Plugins';
     /**
-     * Name of views directory.
+     * Relative path: /Themes/
      */
-    public const THEME_DIR = DIRECTORY_SEPARATOR . self::THEME_DIR_NAME;
+    public const THEMES_DIR = DIRECTORY_SEPARATOR . self::THEMES_DIR_NAME;
     /**
      * Relative path: /var/
      */
@@ -71,7 +76,6 @@ class Statics {
      * Relative path: /var/public/theme/
      */
     public const ASSET_CACHE_DIR = Statics::PUBLIC_DIR . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME;
-
     /**
      * Relative path: /var/cache/
      */

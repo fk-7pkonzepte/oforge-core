@@ -28,7 +28,7 @@ class DevClearDatabaseCommand extends AbstractCommand {
      */
     public function handle(Input $input, Logger $output) : void {
         /** @var Connection $entityManagerConnection */
-        $entityManagerConnection = Oforge()->DB()->getManager()->getConnection();
+        $entityManagerConnection = Oforge()->DB()->getEntityManager()->getConnection();
         // $entityManagerConnection->getConfiguration()->setSQLLogger(null);
 
         try {

@@ -19,7 +19,7 @@ class TemplateManagementService {
     private $repo;
     
     public function __construct() {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->repo = $this->em->getRepository(Template::class);
     }
 
@@ -64,7 +64,7 @@ class TemplateManagementService {
         $template = $this->repo->findOneBy(["name" => $name]);
         
         if (!isset($template)) {
-            $className = Statics::THEME_DIR_NAME . "\\" . $name . "\\Template";
+            $className = Statics::THEMES_DIR_NAME . "\\" . $name . "\\Template";
             $parent = null;
             
             if (is_subclass_of($className, AbstractTemplate::class)) {
