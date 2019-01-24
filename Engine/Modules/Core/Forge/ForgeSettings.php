@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Modules\Core;
+namespace Oforge\Engine\Modules\Core\Forge;
 
 /**
  * Class ForgeSettings
@@ -44,10 +44,10 @@ class ForgeSettings {
      * Load the settings
      */
     public function load() {
-        $config = require_once $this->path;
+        $config         = require_once $this->path;
         $this->settings = $config;
     }
-    
+
     /**
      * get a specific setting value based on a defined key
      *
@@ -55,7 +55,7 @@ class ForgeSettings {
      *
      * @return array|mixed
      */
-    public function get(string $key)  {
+    public function get(string $key) {
         return array_key_exists($key, $this->settings) ? $this->settings[$key] : [];
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Modules\Core;
+namespace Oforge\Engine\Modules\Core\Forge;
 
 use Slim\App as SlimApp;
 use Slim\Http\Response;
@@ -12,8 +12,8 @@ use Slim\Http\Response;
  *
  * @package Oforge\Engine\Modules\Core
  */
-class App extends SlimApp {
-    /** @var App $instance */
+class ForgeSlimApp extends SlimApp {
+    /** @var ForgeSlimApp $instance */
     protected static $instance = null;
 
     /**
@@ -44,11 +44,11 @@ class App extends SlimApp {
     }
 
     /**
-     * @return App
+     * @return ForgeSlimApp
      */
-    public static function getInstance() : App {
+    public static function getInstance() : ForgeSlimApp {
         if (!isset(self::$instance)) {
-            self::$instance = new App();
+            self::$instance = new ForgeSlimApp();
         }
 
         return self::$instance;

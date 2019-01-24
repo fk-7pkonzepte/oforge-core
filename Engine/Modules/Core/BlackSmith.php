@@ -2,14 +2,14 @@
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractTemplateManager;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractViewManager;
-use Oforge\Engine\Modules\Core\App;
-use Oforge\Engine\Modules\Core\ForgeSettings;
+use Oforge\Engine\Modules\Core\Forge\ForgeSlimApp;
+use Oforge\Engine\Modules\Core\Forge\Database\ForgeDatabase;
+use Oforge\Engine\Modules\Core\Forge\ForgeSettings;
 use Oforge\Engine\Modules\Core\Manager\Logger\LoggerManager;
 use Oforge\Engine\Modules\Core\Manager\Modules\ModuleManager;
 use Oforge\Engine\Modules\Core\Manager\Plugins\PluginManager;
 use Oforge\Engine\Modules\Core\Manager\Routes\RouteManager;
 use Oforge\Engine\Modules\Core\Manager\Services\ServiceManager;
-use Oforge\Engine\Modules\Core\Models\ForgeDatabase;
 
 // TODO: find a better way to use a TemplateEngine Module
 
@@ -27,7 +27,7 @@ class BlackSmith {
     /**
      * App
      *
-     * @var App $app
+     * @var \Oforge\Engine\Modules\Core\Forge\ForgeSlimApp $app
      */
     private $app = null;
     /**
@@ -106,9 +106,9 @@ class BlackSmith {
     }
 
     /**
-     * @return App
+     * @return \Oforge\Engine\Modules\Core\Forge\ForgeSlimApp
      */
-    public function App() : App {
+    public function App() : ForgeSlimApp {
         if (!isset($this->app)) {
             throw new \RuntimeException(self::INIT_RUNTIME_EXCEPTION_MESSAGE);
         }
@@ -240,7 +240,7 @@ class BlackSmith {
         $this->services = ServiceManager::getInstance();
 
         // Start slim application
-        $this->app       = App::getInstance();
+        $this->app       = ForgeSlimApp::getInstance();
         $this->container = $this->App()->getContainer();
 
         // Init and load modules
