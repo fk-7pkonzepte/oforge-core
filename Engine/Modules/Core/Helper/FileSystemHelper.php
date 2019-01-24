@@ -18,7 +18,7 @@ class FileSystemHelper {
     }
 
     /**
-     * Deletes single file or directory.
+     * Delete single file or directory.
      * Directories can optionally be recursively deleted and empty directories will not be deleted.
      *
      * @param string $path Path to file or directory
@@ -59,28 +59,6 @@ class FileSystemHelper {
     }
 
     /**
-     * Get all Bootstrap.php files inside a defined path
-     *
-     * @param string $path
-     *
-     * @return string[]
-     */
-    public static function getBootstrapFiles(string $path) {
-        return self::findFiles($path, 'bootstrap');
-    }
-
-    /**
-     * Get all template files inside a defined path
-     *
-     * @param string $path
-     *
-     * @return string[]
-     */
-    public static function findThemeBootstrapFiles(string $path) {
-        return self::findFiles($path, 'theme');
-    }
-
-    /**
      * Search recursive for for files with name inside a path.
      *
      * @param string $path string Directory or file path.
@@ -107,6 +85,28 @@ class FileSystemHelper {
         }
 
         return $result;
+    }
+
+    /**
+     * Get all Bootstrap.php files inside a defined path
+     *
+     * @param string $path
+     *
+     * @return string[]
+     */
+    public static function getBootstrapFiles(string $path) {
+        return self::findFiles($path, 'bootstrap');
+    }
+
+    /**
+     * Get all template files inside a defined path
+     *
+     * @param string $path
+     *
+     * @return string[]
+     */
+    public static function getThemeBootstrapFiles(string $path) {
+        return self::findFiles($path, 'theme');
     }
 
     /**

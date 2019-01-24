@@ -11,14 +11,20 @@ namespace Oforge\Engine\Modules\Core\Helper;
 class PhpArrayFileWriter {
 
     /**
+     * Prevent instance.
+     */
+    private function __construct() {
+    }
+
+    /**
      * @param string $filepath
      * @param array $data
      *
      * @return bool True on success.
      */
-    public static function write(string $filepath, array $data) {
+    public static function write(string $filepath, array $data) : bool {
         $text = '<?php return [';
-        self::recrusive($text, $data, 1);
+        self::convert($text, $data, 1);
         $text .= PHP_EOL . '];';
 
         return false !== file_put_contents($filepath, $text, LOCK_EX);
@@ -28,7 +34,7 @@ class PhpArrayFileWriter {
      * @param string $text
      * @param array $data
      */
-    private static function recrusive(string &$text, array $data, $indent) {
+    private static function convert(string &$text, array $data, $indent) {
         $isAssoc = ArrayHelper::isAssoc($data);
         foreach ($data as $key => $value) {
             $text .= PHP_EOL . str_repeat(' ', 4 * $indent);
@@ -41,7 +47,7 @@ class PhpArrayFileWriter {
             }
             if (is_array($value)) {
                 $text .= '[';
-                self::recrusive($text, $value, $indent + 1);
+                self::convert($text, $value, $indent + 1);
                 $text .= PHP_EOL . str_repeat(' ', 4 * $indent) . ']';
             } else {
                 $text .= var_export($value, true);
