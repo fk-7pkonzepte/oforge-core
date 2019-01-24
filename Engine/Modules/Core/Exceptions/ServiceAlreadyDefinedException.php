@@ -1,21 +1,21 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthaeus.Schmedding
- * Date: 11.10.2018
- * Time: 09:17
- */
 
 namespace Oforge\Engine\Modules\Core\Exceptions;
 
-class ServiceAlreadyDefinedException extends \Exception
-{
+/**
+ * Class ServiceAlreadyDefinedException
+ *
+ * @package Oforge\Engine\Modules\Core\Exceptions
+ */
+class ServiceAlreadyDefinedException extends \Exception {
+
     /**
-     * ServiceNotFoundException constructor.
-     * @param $name
+     * ServiceAlreadyDefinedException constructor.
+     *
+     * @param string $name
      */
-    public function __construct($name)
-    {
-        parent::__construct("A service with the name $name is already defined!");
+    public function __construct(string $name) {
+        parent::__construct("Service with name '$name' already defined!");
     }
+
 }

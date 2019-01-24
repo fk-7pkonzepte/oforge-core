@@ -4,7 +4,7 @@ namespace Oforge\Engine\Modules\Core\Services;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException;
 use Oforge\Engine\Modules\Core\Helper\ArrayHelper;
 use Oforge\Engine\Modules\Core\Models\Endpoints\Endpoint;
 
@@ -35,7 +35,7 @@ class EndpointService {
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      */
     public function register(array $endpoints) {
         $endpointConfigs = $this->prepareEndpointConfigs($endpoints);
@@ -60,7 +60,7 @@ class EndpointService {
      *
      * @param array $endpoints
      *
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      * @throws \Doctrine\ORM\ORMException
      */
     public function unregister(array $endpoints) {//TODO ungetestet
@@ -85,14 +85,14 @@ class EndpointService {
      * @param array $options
      *
      * @return bool
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      */
     protected function isValid(array $options) {
         // Check if required keys are within the options
         $keys = ['controller', 'name'];
         foreach ($keys as $key) {
             if (!array_key_exists($key, $options)) {
-                throw new ConfigOptionKeyNotExists($key);
+                throw new ConfigOptionKeyNotExistException($key);
             }
         }
 
@@ -103,7 +103,7 @@ class EndpointService {
      * @param array $endpoints
      *
      * @return array
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      */
     protected function prepareEndpointConfigs(array $endpoints) : array {
         $endpointConfigs = [];

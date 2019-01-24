@@ -5,7 +5,7 @@ namespace Oforge\Engine\Modules\Cronjob\Services;
 use Doctrine\ORM\EntityRepository;
 use Monolog\Handler\RotatingFileHandler;
 use Oforge\Engine\Modules\Console\Services\ConsoleService;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException;
 use Oforge\Engine\Modules\Core\Exceptions\InvalidClassException;
 use Oforge\Engine\Modules\Core\Exceptions\NotFoundException;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
@@ -42,7 +42,7 @@ class CronjobService {
      *
      * @param array $options
      *
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      * @throws InvalidClassException
      */
     public function addCronjob(array $options) {
@@ -183,12 +183,12 @@ class CronjobService {
      * @param array $options
      *
      * @return bool
-     * @throws ConfigOptionKeyNotExists
+     * @throws ConfigOptionKeyNotExistException
      * @throws InvalidClassException
      */
     protected function isValid(array $options) : bool {
         if (!isset($options['type'])) {
-            throw new ConfigOptionKeyNotExists('type');
+            throw new ConfigOptionKeyNotExistException('type');
         }
         if (!in_array($options['type'], [CommandCronjob::class, CustomCronjob::class])) {
             $type = $options['type'];
@@ -206,7 +206,7 @@ class CronjobService {
         }
         foreach ($requiredKeys as $dataKey) {
             if (!isset($options[$dataKey]) || empty($options[$dataKey])) {
-                throw new ConfigOptionKeyNotExists($dataKey);
+                throw new ConfigOptionKeyNotExistException($dataKey);
             }
         }
         /**

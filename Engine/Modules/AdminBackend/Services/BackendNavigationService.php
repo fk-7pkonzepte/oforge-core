@@ -3,8 +3,8 @@
 namespace Oforge\Engine\Modules\AdminBackend\Services;
 
 use Oforge\Engine\Modules\AdminBackend\Models\BackendNavigation;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException;
 use Oforge\Engine\Modules\Core\Exceptions\ParentNotFoundException;
 
 class BackendNavigationService
@@ -27,8 +27,8 @@ class BackendNavigationService
 	/**
 	 * @param array $options
 	 *
-	 * @throws ConfigElementAlreadyExists
-	 * @throws ConfigOptionKeyNotExists
+	 * @throws ConfigElementAlreadyExistException
+	 * @throws ConfigOptionKeyNotExistException
 	 * @throws ParentNotFoundException
 	 * @throws \Doctrine\ORM\ORMException
 	 * @throws \Doctrine\ORM\OptimisticLockException
@@ -63,8 +63,8 @@ class BackendNavigationService
 	 * @param array $options
 	 *
 	 * @return bool
-	 * @throws ConfigElementAlreadyExists
-	 * @throws ConfigOptionKeyNotExists
+	 * @throws ConfigElementAlreadyExistException
+	 * @throws ConfigOptionKeyNotExistException
 	 * @throws ParentNotFoundException
 	 */
 	private function isValid($options)
@@ -73,14 +73,14 @@ class BackendNavigationService
         $keys = ["name"];
         foreach ($keys as $key) {
             if (!array_key_exists($key, $options)) {
-	            throw new ConfigOptionKeyNotExists($key);
+	            throw new ConfigOptionKeyNotExistException($key);
             }
         }
 
         // Check if the element is already within the system
         $element = $this->repository->findOneBy([ "name" => strtolower($options["name"])]);
         if (isset($element)) {
-	        throw new ConfigElementAlreadyExists(strtolower($options["name"]));
+	        throw new ConfigElementAlreadyExistException(strtolower($options["name"]));
         }
 
         if (key_exists("parent", $options)) {

@@ -2,13 +2,20 @@
 
 namespace Oforge\Engine\Modules\Core\Exceptions;
 
-class TemplateNotFoundException extends \Exception
-{
+/**
+ * Class TemplateNotFoundException
+ *
+ * @package Oforge\Engine\Modules\Core\Exceptions
+ */
+class TemplateNotFoundException extends NotFoundException {
+
     /**
      * TemplateNotFoundException constructor.
-     * @param $name
+     *
+     * @param string $name
      */
-    public function __construct($name) {
-        parent::__construct("Template $name not found.");
+    public function __construct(string $name) {
+        parent::__construct("Template with name '$name' not found.");
     }
+
 }

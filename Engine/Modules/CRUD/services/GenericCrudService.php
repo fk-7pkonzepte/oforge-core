@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Modules\CRUD\Services;
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
 use Oforge\Engine\Modules\Core\Exceptions\NotFoundException;
 
 
@@ -67,7 +67,7 @@ class GenericCrudService
      * @param $class
      * @param array $options
      *
-     * @throws ConfigElementAlreadyExists
+     * @throws ConfigElementAlreadyExistException
      * @throws \Doctrine\ORM\ORMException
      */
     public function create($class, array $options)
@@ -77,7 +77,7 @@ class GenericCrudService
         if (isset($options["id"])) {
             $element = $repo->findOneBy( [ "id" => $options["id"] ] );
             if ( isset( $element ) ) {
-                throw new ConfigElementAlreadyExists( "Element with id " . $options["id"] . " already exists!" );
+                throw new ConfigElementAlreadyExistException("Element with id " . $options["id"] . " already exists!" );
             }
         }
 

@@ -4,7 +4,7 @@ namespace Oforge\Engine\Modules\Core\Manager\Modules;
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Bootstrap;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
 use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallModuleException;
 use Oforge\Engine\Modules\Core\Helper\Helper;
 use Oforge\Engine\Modules\Core\Models\Module\Module;
@@ -156,7 +156,7 @@ class ModuleManager
             if (isset($entry) && !$entry->getInstalled()) {
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $this->em->persist($entry->setInstalled(true));
@@ -164,7 +164,7 @@ class ModuleManager
                 $this->register($className);
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $entry = $this->moduleRepository->findOneBy(["name" => $className]);
@@ -240,7 +240,7 @@ class ModuleManager
             if (isset($entry) && !$entry->getInstalled()) {
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $this->em->persist($entry->setInstalled(true));

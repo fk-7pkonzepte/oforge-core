@@ -3,19 +3,19 @@
 namespace Oforge\Engine\Modules\Core\Exceptions;
 
 /**
- * Class ParentNotFoundException
+ * Class ConfigElementAlreadyExistException
  *
  * @package Oforge\Engine\Modules\Core\Exceptions
  */
-class ParentNotFoundException extends NotFoundException {
+class ConfigElementAlreadyExistException extends AlreadyExistException {
 
     /**
-     * ParentNotFoundException constructor.
+     * ConfigElementAlreadyExistException constructor.
      *
      * @param string $name
      */
     public function __construct(string $name) {
-        parent::__construct("Parent element with name '$name' not found!");
+        parent::__construct('Config element', $name);
     }
 
 }
