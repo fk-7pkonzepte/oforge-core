@@ -6,8 +6,9 @@ use Oforge\Engine\Modules\Console\Commands\Cleanup\CleanupLogfilesCommand;
 use Oforge\Engine\Modules\Console\Commands\Console\CommandListCommand;
 use Oforge\Engine\Modules\Console\Commands\Core\PingCommand;
 use Oforge\Engine\Modules\Console\Commands\Dev\Clear\DevClearBatchCommand;
-use Oforge\Engine\Modules\Console\Commands\Dev\Clear\DevClearDatabaseCommand;
 use Oforge\Engine\Modules\Console\Commands\Dev\Clear\DevClearDoctrineOrmCacheCommand;
+use Oforge\Engine\Modules\Console\Commands\Dev\Clear\DevClearDropDatabaseTablesCommand;
+use Oforge\Engine\Modules\Console\Commands\Dev\Clear\DevClearTruncateDatabaseTablesCommand;
 use Oforge\Engine\Modules\Console\Commands\Doctrine\DoctrineOrmWrapperCommand;
 use Oforge\Engine\Modules\Console\Commands\Example\ExampleBatchCommand;
 use Oforge\Engine\Modules\Console\Commands\Example\ExampleCommandOne;
@@ -33,8 +34,9 @@ class Bootstrap extends AbstractBootstrap {
         $this->commands = [
             CleanupLogfilesCommand::class,
             DevClearBatchCommand::class,
-            DevClearDatabaseCommand::class,
             DevClearDoctrineOrmCacheCommand::class,
+            DevClearDropDatabaseTablesCommand::class,
+            DevClearTruncateDatabaseTablesCommand::class,
             CommandListCommand::class,
             DoctrineOrmWrapperCommand::class,
             ExampleBatchCommand::class,

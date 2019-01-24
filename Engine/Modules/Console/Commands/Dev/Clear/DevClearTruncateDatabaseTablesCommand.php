@@ -13,14 +13,14 @@ use Oforge\Engine\Modules\Console\Lib\Input;
  *
  * @package Oforge\Engine\Modules\Console\Commands\Dev\Clear
  */
-class DevClearDatabaseCommand extends AbstractCommand {
+class DevClearTruncateDatabaseTablesCommand extends AbstractCommand {
 
     /**
      * DevClearDatabaseCommand constructor.
      */
     public function __construct() {
-        parent::__construct('oforge:dev:clear:db', self::TYPE_DEVELOPMENT);
-        $this->setDescription('Truncate database');
+        parent::__construct('oforge:dev:clear:db:truncate', self::TYPE_DEVELOPMENT);
+        $this->setDescription('Truncate database tables');
     }
 
     /**
@@ -33,8 +33,9 @@ class DevClearDatabaseCommand extends AbstractCommand {
 
         try {
             $entityManagerConnection->prepare('SET FOREIGN_KEY_CHECKS = 0;')->execute();
-            foreach ($entityManagerConnection->getSchemaManager()->listTableNames() as $tableName) {
-                $sql = 'DROP TABLE ' . $tableName;
+            $tableNames = $entityManagerConnection->getSchemaManager()->listTableNames();
+            foreach ($tableNames as $tableName) {
+                $sql = 'TRUNCATE ' . $tableName;
                 $entityManagerConnection->prepare($sql)->execute();
             }
             $entityManagerConnection->prepare('SET FOREIGN_KEY_CHECKS = 1;')->execute();
