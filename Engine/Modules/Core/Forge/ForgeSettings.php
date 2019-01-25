@@ -21,9 +21,9 @@ class ForgeSettings {
     /**
      * ForgeSettings constructor.
      *
-     * @param null $path
+     * @param string|null $path
      */
-    protected function __construct($path = null) {
+    protected function __construct(?string $path = null) {
         $this->path = $path ?? self::CONFIG_FILE;
     }
 

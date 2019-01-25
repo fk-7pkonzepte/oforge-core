@@ -1,107 +1,98 @@
 <?php
+
 namespace Oforge\Engine\Modules\Core\Models\Config;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
+
 /**
- * @ORM\Table(name="oforge_core_config_values")
  * @ORM\Entity
+ * @ORM\Table(name="oforge_core_config_values")
  */
-class Value extends AbstractModel
-{
+class Value extends AbstractModel {
     /**
-     * @var int
+     * @var int $id
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
     /**
-     * @var string
-     * @ORM\ManyToOne(targetEntity="Element", inversedBy="values")
-     * @ORM\JoinColumn(name="element_id", referencedColumnName="id")
+     * @var Config $config
+     * @ORM\ManyToOne(targetEntity="Config", inversedBy="values")
+     * @ORM\JoinColumn(name="config_id", referencedColumnName="id")
      */
-    private $element;
+    private $config;
+    /**
+     * @var mixed $value
+     * @ORM\Column(name="value", type="object", nullable=true, options={"default":null})
+     */
+    private $value = null;
+    /**
+     * @var string $scope
+     * @ORM\Column(name="scope", type="string", nullable=true, options={"default":null})
+     */
+    private $scope = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="value", type="object", nullable=true)
-     */
-    private $value;
-
-    /**
-     * @var string
-     * @ORM\Column(name="scope", type="integer", nullable=true)
-     */
-    private $scope;
-    /**
-     * Get id
-     *
      * @return int
      */
-    public function getId()
-    {
+    public function getId() : int {
         return $this->id;
     }
+
     /**
-     * Set element
-     *
-     * @param Element $element
+     * @return Config
+     */
+    public function getConfig() : Config {
+        return $this->config;
+    }
+
+    /**
+     * @param Config $config
      *
      * @return Value
      */
-    public function setElement($element)
-    {
-        $this->element = $element;
+    public function setConfig(Config $config) : Value {
+        $this->config = $config;
+
         return $this;
     }
+
     /**
-     * Get element
-     *
-     * @return Element
+     * @return mixed
      */
-    public function getElement()
-    {
-        return $this->element;
+    public function getValue() {
+        return $this->value;
     }
-   
+
     /**
-     * Set value
-     *
      * @param mixed $value
      *
      * @return Value
      */
-    public function setValue($value)
-    {
+    public function setValue($value) : Value {
         $this->value = $value;
+
         return $this;
     }
+
     /**
-     * Get value
-     *
-     * @return mixed
+     * @return string|null
      */
-    public function getValue()
-    {
-        return $this->value;
+    public function getScope() : ?string {
+        return $this->scope;
     }
 
     /**
      * @param int $scope
      *
-     * @return Element
+     * @return Value
      */
-    public function setScope($scope)
-    {
+    protected function setScope(int $scope) : Value {
         $this->scope = $scope;
+
         return $this;
     }
-    /**
-     * @return int
-     */
-    public function getScope()
-    {
-        return $this->scope;
-    }
+
 }

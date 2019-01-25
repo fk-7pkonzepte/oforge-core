@@ -355,7 +355,7 @@ class CronjobService {
      * @return string
      */
     protected function getLogFilePath(string $cronjobID) : string {
-        return CronjobStatics::CRONJOB_LOGS_DIR_ABS . DIRECTORY_SEPARATOR . str_replace(':', '_', $cronjobID) . LoggerManager::FILE_EXTENSION;
+        return CronjobStatics::CRONJOB_LOGS_DIR_ABS . DIRECTORY_SEPARATOR . str_replace(':', '_', $cronjobID) . LoggerManager::LOGFILE_EXTENSION;
     }
 
 }

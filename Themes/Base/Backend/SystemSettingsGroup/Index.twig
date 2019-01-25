@@ -30,6 +30,17 @@
                                            value="{{ element.values[0].value }}">
                                 </div>
 
+                            {% elseif element.type == "password" %}
+                                <div class="form-group">
+                                    <label for="{{ element.name }}">
+                                        {{ i18n(element.label) }}
+                                    </label>
+                                    <input type="{{ element.type }}"
+                                           class="form-control"
+                                           name="{{ element.name }}"
+                                           value="{{ element.values[0].value }}" />
+                                </div>
+
                             {% elseif element.type == "integer" %}
                                 <div class="form-group">
                                     <label for="{{ element.name }}">{{ i18n(element.label) }}</label>

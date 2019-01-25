@@ -3,7 +3,7 @@
 namespace Oforge\Engine\Modules\Core;
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
-use Oforge\Engine\Modules\Core\Models\Config\Element;
+use Oforge\Engine\Modules\Core\Models\Config\Config;
 use Oforge\Engine\Modules\Core\Models\Config\Value;
 use Oforge\Engine\Modules\Core\Models\Endpoints\Endpoint;
 use Oforge\Engine\Modules\Core\Models\Module\Module;
@@ -19,7 +19,7 @@ use Oforge\Engine\Modules\Core\Services\PluginAccessService;
 use Oforge\Engine\Modules\Core\Services\PluginStateService;
 
 /**
- * Class Bootstrap
+ * Class Core-Bootstrap
  *
  * @package Oforge\Engine\Modules\Core
  */
@@ -28,7 +28,7 @@ class Bootstrap extends AbstractBootstrap {
     public function __construct() {
         $this->models = [
             Module::class,
-            Element::class,
+            Config::class,
             Value::class,
             Plugin::class,
             Middleware::class,
@@ -50,12 +50,15 @@ class Bootstrap extends AbstractBootstrap {
     }
 
     /**
-     *
+     * @throws Exceptions\ConfigOptionKeyNotExistException
+     * @throws Exceptions\ServiceNotFoundException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function install() {
         /** @var ConfigService $configService */
         $configService = Oforge()->Services()->get('config');
-        $configService->update([
+        $configService->add([
             'name'    => 'system_debug',
             'label'   => 'Debug aktivieren',
             'type'    => 'boolean',
