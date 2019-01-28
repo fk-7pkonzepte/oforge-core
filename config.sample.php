@@ -38,5 +38,10 @@ return [
             'charset'  => 'utf8' // we expect to use utf8 charset everywhere (webserver, mysql, php, etc)
         ],
     ],
-    'jwt_salt' => 'my awesome salt' // Change this salt for security
+    'jwt_salt' => 'my awesome salt', // Change this salt for security
+    // config for db value encrypt/decrypt
+    'encryption'            => [
+        // 'method' => 'aes-128-gcm', // Default: aes-128-gcm
+        'key' => 'my awesome salt',
+    ],
 ];
