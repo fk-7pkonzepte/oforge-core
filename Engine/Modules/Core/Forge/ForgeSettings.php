@@ -52,11 +52,12 @@ class ForgeSettings {
      * get a specific setting value based on a defined key
      *
      * @param string $key
+     * @param mixed $default
      *
      * @return array|mixed
      */
-    public function get(string $key) {
-        return array_key_exists($key, $this->settings) ? $this->settings[$key] : [];
+    public function get(string $key, $default = []) {
+        return isset($this->settings[$key]) ? $this->settings[$key] : $default;
     }
 
 }

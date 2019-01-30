@@ -5,6 +5,7 @@ use Oforge\Engine\Modules\Core\Abstracts\AbstractViewManager;
 use Oforge\Engine\Modules\Core\Forge\ForgeSlimApp;
 use Oforge\Engine\Modules\Core\Forge\Database\ForgeDatabase;
 use Oforge\Engine\Modules\Core\Forge\ForgeSettings;
+use Oforge\Engine\Modules\Core\Manager\BootManager\BootManager;
 use Oforge\Engine\Modules\Core\Manager\Logger\LoggerManager;
 use Oforge\Engine\Modules\Core\Manager\Modules\ModuleManager;
 use Oforge\Engine\Modules\Core\Manager\Plugins\PluginManager;
@@ -30,6 +31,10 @@ class BlackSmith {
      * @var \Oforge\Engine\Modules\Core\Forge\ForgeSlimApp $app
      */
     private $app = null;
+    /**
+     * @var BootManager $bootManager
+     */
+    private $bootManager = null;
     /**
      * Container
      *
@@ -114,6 +119,17 @@ class BlackSmith {
         }
 
         return $this->app;
+    }
+
+    /**
+     * @return BootManager
+     */
+    public function getBootManager() : BootManager {
+        if (!isset($this->bootManager)) {
+            throw new \RuntimeException(self::INIT_RUNTIME_EXCEPTION_MESSAGE);
+        }
+
+        return $this->bootManager;
     }
 
     /**
@@ -243,13 +259,17 @@ class BlackSmith {
         $this->app       = ForgeSlimApp::getInstance();
         $this->container = $this->App()->getContainer();
 
-        // Init and load modules
-        $modules = ModuleManager::getInstance();
-        $modules->init();
+        // Init modules and plugins
+        $this->bootManager = BootManager::getInstance();
+        $this->bootManager->init();
 
-        // Init and load plugins
-        $this->pluginManager = PluginManager::getInstance();
-        $this->pluginManager->init();
+        // // Init and load modules
+        // $modules = ModuleManager::getInstance();
+        // $modules->init();
+        //
+        // // Init and load plugins
+        // $this->pluginManager = PluginManager::getInstance();
+        // $this->pluginManager->init();
 
         // Init route manager
         $this->router = RouteManager::getInstance();

@@ -153,7 +153,7 @@ class ModuleManager
              */
             $entry = $this->moduleRepository->findOneBy(["name" => $className]);
 
-            if (isset($entry) && !$entry->getInstalled()) {
+            if (isset($entry) && !$entry->isInstalled()) {
                 try {
                     $instance->install();
                 } catch(ConfigElementAlreadyExistException $e) {
@@ -237,7 +237,7 @@ class ModuleManager
              */
             $entry = $this->moduleRepository->findOneBy(["name" => $className]);
 
-            if (isset($entry) && !$entry->getInstalled()) {
+            if (isset($entry) && !$entry->isInstalled()) {
                 try {
                     $instance->install();
                 } catch(ConfigElementAlreadyExistException $e) {

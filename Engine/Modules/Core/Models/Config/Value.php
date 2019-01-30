@@ -4,6 +4,9 @@ namespace Oforge\Engine\Modules\Core\Models\Config;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
+use Oforge\Engine\Modules\Core\Exceptions\EncryptionException;
+use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
+use Oforge\Engine\Modules\Core\Services\EncryptionService;
 
 /**
  * @ORM\Entity
@@ -63,6 +66,19 @@ class Value extends AbstractModel {
      * @return mixed
      */
     public function getValue() {
+        if (!is_null($this->config) && $this->config->getType() === ConfigType::PASSWORD) {
+            try {
+                /** @var EncryptionService $encryptionService */
+                $encryptionService = Oforge()->Services()->get('encryption');
+
+                return $encryptionService->decrypt($this->value);
+            } catch (ServiceNotFoundException $exception) {
+                Oforge()->Logger()->logException($exception);
+            } catch (EncryptionException $exception) {
+                Oforge()->Logger()->logException($exception);
+            }
+        }
+
         return $this->value;
     }
 
@@ -72,7 +88,22 @@ class Value extends AbstractModel {
      * @return Value
      */
     public function setValue($value) : Value {
-        $this->value = $value;
+        if (!is_null($this->config) && $this->config->getType() === ConfigType::PASSWORD) {
+            $this->value = base64_encode($value);
+            try {
+                /** @var EncryptionService $encryptionService */
+                $encryptionService = Oforge()->Services()->get('encryption');
+                $this->value       = $encryptionService->encrypt($this->value);
+            } catch (ServiceNotFoundException $exception) {
+                Oforge()->Logger()->logException($exception);
+                $this->value = $value;
+            } catch (EncryptionException $exception) {
+                Oforge()->Logger()->logException($exception);
+                $this->value = $value;
+            }
+        } else {
+            $this->value = $value;
+        }
 
         return $this;
     }

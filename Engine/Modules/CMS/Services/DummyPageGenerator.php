@@ -33,7 +33,7 @@ class DummyPageGenerator
             "oforge_cms_page_content"
         ];
 
-        $fullDir = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::VAR_DIR . DIRECTORY_SEPARATOR . "dummy_data" . DIRECTORY_SEPARATOR;
+        $fullDir = ROOT_PATH . Statics::VAR_DIR . DIRECTORY_SEPARATOR . "dummy_data" . DIRECTORY_SEPARATOR;
 
         foreach ($files as $file) {
             try {

@@ -12,8 +12,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
 use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExists;
 use Oforge\Engine\Modules\Core\Exceptions\NotFoundException;
 
 /**
@@ -99,10 +97,11 @@ class GenericCrudService {
     public function create(string $class, array $options) {
         $repository = $this->getRepository($class);
 
-        if (isset($options["id"])) {
-            $element = $repository->findOneBy(["id" => $options["id"]]);
-            if (isset($element)) {
-                throw new ConfigElementAlreadyExistException("Element with id " . $options["id"] . " already exists!" );
+        if (isset($options['id'])) {
+            $id     = $options['id'];
+            $entity = $repository->findOneBy(['id' => $id]);
+            if (isset($entity)) {
+                throw new ConfigElementAlreadyExistException("Entity with id '$id' already exists!");
             }
         }
         /** @var AbstractModel $instance */
@@ -121,7 +120,6 @@ class GenericCrudService {
      * @param array $options
      *
      * @throws NotFoundException
-     * @throws ConfigOptionKeyNotExists
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */

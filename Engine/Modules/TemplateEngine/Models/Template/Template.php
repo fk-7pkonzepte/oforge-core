@@ -109,7 +109,7 @@ class Template extends AbstractModel
     /**
      * @return bool
      */
-    public function getInstalled()
+    public function isInstalled()
     {
         return $this->installed;
     }
