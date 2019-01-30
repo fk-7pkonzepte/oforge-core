@@ -15,25 +15,24 @@ use Oforge\Engine\Modules\TemplateEngine\Models\Template\Template;
 
 class TemplateManagementService {
     
-    private $em;
-    private $repo;
+    private $entityManager;
+    private $repository;
     
     public function __construct() {
-        $this->em = Oforge()->DB()->getEntityManager();
-        $this->repo = $this->em->getRepository(Template::class);
+        $this->entityManager = Oforge()->DB()->getEntityManager();
+        $this->repository = $this->entityManager->getRepository(Template::class);
     }
 
     /**
      * @param $name
+     *
      * @throws TemplateNotFoundException
      * @throws \Doctrine\ORM\ORMException
      */
     public function activate($name) {
-        /**
-         * @var $templateToActivate Template
-         */
-        $templateToActivate = $this->repo->findOneBy(["name" => $name]);
-        $activeTemplate = $this->repo->findOneBy(["active" => 1]);
+        /** @var $templateToActivate Template */
+        $templateToActivate = $this->repository->findOneBy(["name" => $name]);
+        $activeTemplate = $this->getActiveTemplate();
 
         if (!isset($templateToActivate)) {
             throw new TemplateNotFoundException($name);
@@ -48,20 +47,23 @@ class TemplateManagementService {
 
         $templateToActivate->setActive(true);
 
-        $this->em->persist($templateToActivate);
-        $this->em->persist($activeTemplate);
-        $this->em->flush();
+        $this->entityManager->persist($templateToActivate);
+        $this->entityManager->persist($activeTemplate);
+        $this->entityManager->flush();
     }
 
     /**
      * Check if the given template name $name is stored in the database. If not, store it in the DB.
-     * @param $name string
+     * @param string $name
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
+     * @throws \Oforge\Engine\Modules\TemplateEngine\Exceptions\InvalidScssVariableException
+     * @throws TemplateNotFoundException
      */
     public function register($name) {
-        $template = $this->repo->findOneBy(["name" => $name]);
+        $template = $this->repository->findOneBy(["name" => $name]);
         
         if (!isset($template)) {
             $className = Statics::THEMES_DIR_NAME . "\\" . $name . "\\Template";
@@ -79,38 +81,77 @@ class TemplateManagementService {
                 /**
                  * @var $parentTemplate Template
                  */
-                $parentTemplate = $this->repo->findOneBy(["name" => $parent]);
+                $parentTemplate = $this->repository->findOneBy(["name" => $parent]);
                 $parent = $parentTemplate->getId();
             }
             
             $template = Template::create(array("name" => $name, "active" => 0, "installed" => 0, "parentId" => $parent));
             
-            $this->em->persist($template);
-            $this->em->flush();
+            $this->entityManager->persist($template);
+            $this->entityManager->flush();
+
+            $instance->registerTemplateVariables();
         }
     }
 
+    /**
+     * @return Template[]
+     */
     public function list() {
-        $templateList = $this->repo->findAll();
-        return $templateList;
+        return $this->repository->findAll();
     }
 
     /**
      * Get the active theme, delete old cached assets, build new assets
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
+     * @throws \Oforge\Engine\Modules\TemplateEngine\Exceptions\InvalidScssVariableException*@throws TemplateNotFoundException
+     * @throws TemplateNotFoundException
      */
     public function build() {
-        /**
-         * @var Template $template
-         */
-        $template = $this->repo->findOneBy(["active" => 1]);
+        /** @var Template $template */
+        $template = $this->getActiveTemplate();
         if ($template) {
-            /**
-             * @var TemplateAssetService $templateAssetService
-             */
+            /** @var TemplateAssetService $templateAssetService */
             $templateAssetService = Oforge()->Services()->get('assets.template');
             $templateAssetService->clear();
-            $templateAssetService->build($templateAssetService::DEFAULT_SCOPE);
+
+            $className = Statics::TEMPLATES_DIR_NAME . "\\" . $template->getName() . "\\Template";
+
+            if (is_subclass_of($className, AbstractTemplate::class)) {
+                /** @var $instance AbstractTemplate */
+                $instance = new $className();
+                $instance->registerTemplateVariables();
+            }
+
+            $templateAssetService->build($template->getName(), $templateAssetService::DEFAULT_SCOPE);
         }
+    }
+
+    /**
+     * @return Template
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws TemplateNotFoundException
+     */
+    public function getActiveTemplate()
+    {
+        /**
+         * @var $template Template
+         */
+        $template = $this->repository->findOneBy(["active" => 1]);
+        if ($template === null) {
+            $template = $this->repository->findOneBy(["name" => "Base"]);
+
+            if ($template === null) {
+                throw new TemplateNotFoundException("Base");
+            }
+
+            $template->setActive(1);
+            $this->entityManager->flush();
+        }
+        return $template;
     }
 }

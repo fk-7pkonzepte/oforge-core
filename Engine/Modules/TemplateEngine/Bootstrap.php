@@ -48,15 +48,26 @@ class Bootstrap extends AbstractBootstrap
         Oforge()->setViewManager(ViewManager::getInstance());
     }
 
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\TemplateNotFoundException
+     */
     public function activate()
     {
         Oforge()->Templates()->init();
+
+        /** @var TemplateManagementService $templateManagementService */
+        $templateManagementService = Oforge()->Services()->get("template.management");
+
+        $templateName = $templateManagementService->getActiveTemplate()->getName();
 
         $scopes = ["Frontend", "Backend"];
 
         foreach ($scopes as $scope) {
             if (!Oforge()->Services()->get("assets.css")->isBuild($scope)) {
-                Oforge()->Services()->get("assets.template")->build($scope);
+                Oforge()->Services()->get("assets.template")->build($templateName ,$scope);
             }
         }
     }

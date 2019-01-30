@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthaeus.Schmedding
- * Date: 07.11.2018
- * Time: 10:39
- */
 
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
@@ -26,14 +20,16 @@ class CssAssetService extends BaseAssetService {
 
     /**
      * @param string $scope
+     * @param $context
      *
      * @return string
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    public function build(string $scope = TemplateAssetService::DEFAULT_SCOPE) : string {
-        parent::build();
+    public function build(string $context, string $scope = TemplateAssetService::DEFAULT_SCOPE) : string {
+        parent::build($context);
+
         $dirs = $this->getAssetsDirectories();
 
         $fileName = "style." . bin2hex(openssl_random_pseudo_bytes(16));
@@ -52,12 +48,10 @@ class CssAssetService extends BaseAssetService {
         // get scss variables and add to compiler
         $scss          = new Compiler();
         $scssService   = Oforge()->Services()->get('scss.variables');
-        $dbVariables   = $scssService->get('frontend');
+        $dbVariables   = $scssService->get(Statics::THEMES_DIR_NAME . '\\' . $context . '\\Template', $scope);
         $scssVariables = [];
 
-        /**
-         * @var ScssVariable $var
-         */
+        /** @var ScssVariable $var */
         foreach ($dbVariables as $var) {
             $scssVariables[$var->getName()] = $var->getValue();
         }
@@ -69,26 +63,19 @@ class CssAssetService extends BaseAssetService {
             $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR . Statics::ASSETS_SCSS_DIR_NAME
                       . DIRECTORY_SEPARATOR;
             if (file_exists($folder) && file_exists($folder . Statics::ASSETS_ALL_SCSS_NAME)) {
-                $scss = new Compiler();
-                $scss->addImportPath($folder);
+                $scss->setImportPaths($folder);
                 $result .= $scss->compile('@import "' . Statics::ASSETS_ALL_SCSS_NAME . '";');
-                $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR . Statics::ASSETS_SCSS_DIR_NAME
-                          . DIRECTORY_SEPARATOR;
-                if (file_exists($folder) && file_exists($folder . Statics::ASSETS_ALL_SCSS_NAME)) {
-                    $scss->setImportPaths($folder);
-                    $result .= $scss->compile('@import "' . Statics::ASSETS_ALL_SCSS_NAME . '";');
-                }
             }
-
-            file_put_contents($outputFull . ".css", $result);
-
-            $minifier = new CSS($outputFull . ".css");
-            $minifier->minify($outputFull . ".min.css");
-
-            $this->store->set($this->getAccessKey($scope), $output . ".min.css");
-            $this->removeOldAssets($fullFolder, $fileName, ".css");
-
-            return $output . ".min.css";
         }
+
+        file_put_contents($outputFull . ".css", $result);
+
+        $minifier = new CSS($outputFull . ".css");
+        $minifier->minify($outputFull . ".min.css");
+
+        $this->store->set($this->getAccessKey($scope), $output . ".min.css");
+        $this->removeOldAssets($fullFolder, $fileName, ".css");
+
+        return $output . ".min.css";
     }
 }

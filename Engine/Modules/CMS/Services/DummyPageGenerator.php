@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Modules\CMS\Services;
 
 use Oforge\Engine\Modules\CMS\Models\Page\PagePath;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 use Oforge\Engine\Modules\Import\Services\ImportService;
 
 

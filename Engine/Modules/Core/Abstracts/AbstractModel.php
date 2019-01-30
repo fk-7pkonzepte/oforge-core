@@ -57,7 +57,7 @@ class AbstractModel {
                     if (isset($classObject)) {
                         $className = $classObject->getName();
                         if (isset($className)) {
-                            $value = Oforge()->DB()->getManager()->getRepository($className)->find($value);
+                            $value = Oforge()->DB()->getEntityManager()->getRepository($className)->find($value);
                         }
                     } else {
                         switch ("" . $params[0]->getType()) {

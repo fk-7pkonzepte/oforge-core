@@ -14,7 +14,7 @@ abstract class AbstractContentType {
     protected $entityManager;
     protected $repository;
     public function __construct() {
-        $this->entityManager = Oforge()->DB()->getManager();
+        $this->entityManager = Oforge()->DB()->getEntityManager();
         $this->repository = $this->entityManager->getRepository(Content::class);
     }
     
