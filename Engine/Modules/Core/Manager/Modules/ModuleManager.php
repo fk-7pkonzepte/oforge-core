@@ -2,14 +2,13 @@
 
 namespace Oforge\Engine\Modules\Core\Manager\Modules;
 
-use Noodlehaus\Exception;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Bootstrap;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
 use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallModuleException;
 use Oforge\Engine\Modules\Core\Helper\Helper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Models\Module\Module;
+use Oforge\Engine\Modules\Core\Statics;
 
 class ModuleManager
 {
@@ -20,7 +19,7 @@ class ModuleManager
 
     protected function __construct()
     {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->moduleRepository = $this->em->getRepository(Module::class);
     }
 
@@ -43,7 +42,7 @@ class ModuleManager
      */
     public function init()
     {
-        $files = Helper::getBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::ENGINE_DIR);
+        $files = Helper::getBootstrapFiles(ROOT_PATH . Statics::ENGINE_DIR);
 
         // init core module
         $this->initCoreModule(Bootstrap::class);
@@ -141,13 +140,13 @@ class ModuleManager
             $instance = new $className();
 
 
-            Oforge()->DB()->initSchema($instance->getModels());
+            Oforge()->DB()->initModelSchemata($instance->getModels());
 
             $services = $instance->getServices();
             Oforge()->Services()->register($services);
 
             $endpoints = $instance->getEndpoints();
-            Oforge()->Services()->get("endpoints")->register($endpoints);
+            Oforge()->Services()->get('endpoint')->register($endpoints);
 
             /**
              * @var $entry Module
@@ -157,7 +156,7 @@ class ModuleManager
             if (isset($entry) && !$entry->getInstalled()) {
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $this->em->persist($entry->setInstalled(true));
@@ -165,7 +164,7 @@ class ModuleManager
                 $this->register($className);
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $entry = $this->moduleRepository->findOneBy(["name" => $className]);
@@ -222,16 +221,16 @@ class ModuleManager
              */
             $instance = new $className();
 
-            Oforge()->DB()->initSchema($instance->getModels());
+            Oforge()->DB()->initModelSchemata($instance->getModels());
 
             $services = $instance->getServices();
             Oforge()->Services()->register($services);
 
             $endpoints = $instance->getEndpoints();
-            Oforge()->Services()->get("endpoints")->register($endpoints);
+            Oforge()->Services()->get('endpoint')->register($endpoints);
 
             $middleware = $instance->getMiddleware();
-            Oforge()->Services()->get("middleware")->registerFromModule($middleware);
+            Oforge()->Services()->get('middleware')->registerFromModule($middleware);
 
             /**
              * @var $entry Module
@@ -241,7 +240,7 @@ class ModuleManager
             if (isset($entry) && !$entry->getInstalled()) {
                 try {
                     $instance->install();
-                } catch(ConfigElementAlreadyExists $e) {
+                } catch(ConfigElementAlreadyExistException $e) {
 
                 }
                 $this->em->persist($entry->setInstalled(true));

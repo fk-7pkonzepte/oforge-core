@@ -5,7 +5,6 @@ namespace Oforge\Engine\Modules\TemplateEngine\Services;
 use GetOpt\ArgumentException;
 use Oforge\Engine\Modules\TemplateEngine\Models\ScssVariable;
 use Oforge\Engine\Modules\Core\Exceptions\NotFoundException;
-use Oforge\Engine\Modules\TemplateEngine\Models\ScssVariableType;
 use phpDocumentor\Reflection\Types\Context;
 
 /**
@@ -18,7 +17,7 @@ class ScssVariableService {
     private $repo;
     
     public function __construct() {
-        $this->em   = Oforge()->DB()->getManager();
+        $this->em   = Oforge()->DB()->getEntityManager();
         $this->repo = $this->em->getRepository(ScssVariable::class);
     }
 
@@ -42,9 +41,6 @@ class ScssVariableService {
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function post($id, $value, $type, $siteId = "0") {
-        if(!$this->isScssVariableType($type)) {
-            throw new ArgumentException();
-        }
 
         $options = array(
             'id'     => $id,
@@ -75,9 +71,6 @@ class ScssVariableService {
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function put($name, $value, $scope, $type, $siteId = null, $context = null) {
-        if(!$this->isScssVariableType($type)) {
-            throw new \InvalidArgumentException('type must be ScssVariableType');
-        }
 
         $options = array(
             'name'    => $name,
@@ -96,16 +89,5 @@ class ScssVariableService {
         $element->fromArray($options);
         $this->em->persist($element);
         $this->em->flush();
-    }
-
-    /**
-     * @param $type
-     *
-     * @return bool
-     */
-    private function isScssVariableType($type) : bool {
-        $scssTypes = array(ScssVariableType::BOOL, ScssVariableType::LIST, ScssVariableType::MAP,
-                           ScssVariableType::NULL,ScssVariableType::NUMBER, ScssVariableType::STRING);
-        return in_array($type, $scssTypes);
     }
 }

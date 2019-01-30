@@ -1,24 +1,24 @@
 <?php
 
-namespace Oforge\Engine\Modules\Console\Commands\Dev;
+namespace Oforge\Engine\Modules\Console\Commands\Dev\Clear;
 
 use Oforge\Engine\Modules\Console\Abstracts\AbstractBatchCommand;
 
 /**
- * Class DevCleanupBatchCommand
+ * Class DevClearBatchCommand
  * Run all oforge:dev:cleanup:* cleanup commands.
  *
  * @package Oforge\Engine\Modules\Console\Commands\Dev
  */
-class DevCleanupBatchCommand extends AbstractBatchCommand {
+class DevClearBatchCommand extends AbstractBatchCommand {
 
     /**
-     * ExampleBatchCommand constructor.
+     * DevClearBatchCommand constructor.
      *
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
     public function __construct() {
-        parent::__construct('oforge:dev:cleanup', [], self::TYPE_DEVELOPMENT);
+        parent::__construct('oforge:dev:clear', [], self::TYPE_DEVELOPMENT);
         $this->setDescription('Run all oforge:dev:cleanup:* cleanup commands.');
     }
 

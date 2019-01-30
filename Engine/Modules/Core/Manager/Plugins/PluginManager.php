@@ -2,12 +2,11 @@
 
 namespace Oforge\Engine\Modules\Core\Manager\Plugins;
 
-use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallPluginException;
 use Oforge\Engine\Modules\Core\Helper\Helper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
 use Oforge\Engine\Modules\Core\Services\PluginStateService;
+use Oforge\Engine\Modules\Core\Statics;
 
 class PluginManager
 {
@@ -32,7 +31,7 @@ class PluginManager
      */
     public function init()
     {
-        $pluginFiles = Helper::getBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR);
+        $pluginFiles = Helper::getBootstrapFiles(ROOT_PATH . Statics::PLUGINS_DIR);
 
         /**
          * @var $pluginService PluginStateService
@@ -42,7 +41,7 @@ class PluginManager
         foreach ($pluginFiles as $pluginName => $dir) {
             $pluginService->register($pluginName);
         }
-        $em = Oforge()->DB()->getManager();
+        $em = Oforge()->DB()->getEntityManager();
         $pluginRepository = $em->getRepository(Plugin::class);
 
         //find all plugins order by "order"

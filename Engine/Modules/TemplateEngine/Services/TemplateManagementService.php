@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
 use Oforge\Engine\Modules\Core\Exceptions\TemplateNotFoundException;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 use Oforge\Engine\Modules\TemplateEngine\Abstracts\AbstractTemplate;
 use Oforge\Engine\Modules\TemplateEngine\Models\Template\Template;
 
@@ -19,7 +19,7 @@ class TemplateManagementService {
     private $repo;
     
     public function __construct() {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->repo = $this->em->getRepository(Template::class);
     }
 
@@ -64,7 +64,7 @@ class TemplateManagementService {
         $template = $this->repo->findOneBy(["name" => $name]);
         
         if (!isset($template)) {
-            $className = Statics::TEMPLATE_DIR . "\\" . $name . "\\Template";
+            $className = Statics::THEMES_DIR_NAME . "\\" . $name . "\\Template";
             $parent = null;
             
             if (is_subclass_of($className, AbstractTemplate::class)) {

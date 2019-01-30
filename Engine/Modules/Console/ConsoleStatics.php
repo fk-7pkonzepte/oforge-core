@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\Modules\Console;
 
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Class ConsoleStatics
@@ -11,11 +11,11 @@ use Oforge\Engine\Modules\Core\Helper\Statics;
  */
 class ConsoleStatics {
     /**
-     * Relative path of console file logs folder.
+     * Relative path: /var/console/
      */
-    public const CONSOLE_LOGS_DIR = DIRECTORY_SEPARATOR . Statics::VAR_DIR . DIRECTORY_SEPARATOR . 'console';
+    public const CONSOLE_LOGS_DIR = Statics::VAR_DIR . DIRECTORY_SEPARATOR . 'console';
     /**
-     * Absolute path of console file logs folder.
+     * Absolute path: ROOT/var/console/
      */
     public const CONSOLE_LOGS_DIR_ABS = ROOT_PATH . self::CONSOLE_LOGS_DIR;
 

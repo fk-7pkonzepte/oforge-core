@@ -1,20 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthaeus.Schmedding
- * Date: 22.11.2018
- * Time: 11:53
- */
 
 namespace Oforge\Engine\Modules\Core\Exceptions;
 
-class CouldNotInstallPluginException extends \Exception {
+/**
+ * Class CouldNotInstallPluginException
+ *
+ * @package Oforge\Engine\Modules\Core\Exceptions
+ */
+class CouldNotInstallPluginException extends CouldNotInstallException {
+
     /**
-     * CouldNotInstallPluginException constructor.
+     * CouldNotInstallModuleException constructor.
      *
      * @param string $classname
+     * @param string[] $dependencies
      */
-    public function __construct( $classname, $dependencies ) {
-        parent::__construct( "The plugin $classname could not be started due to missing dependencies. Missing plugins: " . implode( ", ", $dependencies ) );
+    public function __construct(string $classname, $dependencies) {
+        parent::__construct('plugin', $classname, $dependencies);
     }
+
 }

@@ -4,7 +4,7 @@ namespace Oforge\Engine\Modules\Cronjob\Models;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Modules\Core\Exceptions\InvalidClassException;
-use Oforge\Engine\Modules\Core\Models\DiscriminatorEntry;
+use Oforge\Engine\Modules\Core\Forge\Database\DiscriminatorEntry;
 use Oforge\Engine\Modules\Cronjob\Abstracts\AbstractCronjobHandler;
 
 /**

@@ -4,7 +4,7 @@ namespace Oforge\Engine\Modules\TemplateEngine\Manager;
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractTemplateManager;
 use Oforge\Engine\Modules\Core\Helper\Helper;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 use Oforge\Engine\Modules\TemplateEngine\Services\TemplateManagementService;
 use Oforge\Engine\Modules\TemplateEngine\Services\TemplateRenderService;
 use Psr\Http\Message\ResponseInterface;
@@ -38,7 +38,7 @@ class TemplateManager extends AbstractTemplateManager {
          * @var $templateManagementService TemplateManagementService
          */
         $templateManagementService = Oforge()->Services()->get("template.management");
-        $templateFiles = Helper::getTemplateFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR);
+        $templateFiles = Helper::getTemplateFiles(ROOT_PATH . Statics::THEMES_DIR);
         $templateManagementService->register("Base");
 
         foreach($templateFiles as $templateName => $dir ) {
@@ -47,7 +47,7 @@ class TemplateManager extends AbstractTemplateManager {
             }
         }
     }
-    
+
     /**
      * This render function can be called either from a module controller or a template controller.
      * It checks, whether a template path based on the controllers namespace and the function name exists

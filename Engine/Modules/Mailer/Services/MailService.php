@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\Modules\Mailer\Services;
 
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExists;
+use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException;
 use Oforge\Engine\Modules\Core\Services\ConfigService;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -11,7 +11,8 @@ class MailService
 
     /**
      * @param array $options
-     * @throws ConfigOptionKeyNotExists
+     *
+     * @throws ConfigOptionKeyNotExistException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ConfigElementNotFoundException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      * @throws \PHPMailer\PHPMailer\Exception
@@ -88,7 +89,7 @@ class MailService
         $keys = ["to", "subject", "body"];
         foreach ($keys as $key) {
             if (!array_key_exists($key, $options)) {
-                throw new ConfigOptionKeyNotExists($key);
+                throw new ConfigOptionKeyNotExistException($key);
             }
         }
 

@@ -16,14 +16,18 @@ class ArrayHelper {
     }
 
     /**
-     * Check when array is associative.
+     * Create array with given keys and default value, then merge values of $inputArray
      *
-     * @param array $array
+     * @param array $keys
+     * @param array $inputArray
+     * @param string $defaultValue
      *
-     * @return bool
+     * @return array
      */
-    public static function isAssoc(array $array) : bool {
-        return ($array !== array_values($array));
+    public static function extractArray(array $keys, array $inputArray, $defaultValue = '') : array {
+        $tmp = array_fill_keys($keys, $defaultValue);
+
+        return array_replace($tmp, array_intersect_key($inputArray, $tmp));
     }
 
     /**
@@ -55,18 +59,14 @@ class ArrayHelper {
     }
 
     /**
-     * Create array with given keys and default value, then merge values of $inputArray
+     * Check when array is associative.
      *
-     * @param array $keys
-     * @param array $inputArray
-     * @param string $defaultValue
+     * @param array $array
      *
-     * @return array
+     * @return bool
      */
-    public static function extractArray(array $keys, array $inputArray, $defaultValue = '') : array {
-        $tmp = array_fill_keys($keys, $defaultValue);
-
-        return array_replace($tmp, array_intersect_key($inputArray, $tmp));
+    public static function isAssoc(array $array) : bool {
+        return ($array !== array_values($array));
     }
 
 }

@@ -8,11 +8,11 @@
 
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Helper\StringHelper;
 use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
 use Oforge\Engine\Modules\Core\Services\KeyValueStoreService;
 use Oforge\Engine\Modules\Core\Services\PluginAccessService;
+use Oforge\Engine\Modules\Core\Statics;
 
 class BaseAssetService
 {
@@ -95,7 +95,7 @@ class BaseAssetService
         $templateRenderer = Oforge()->Services()->get("template.render");
         $activeTemplate = $templateRenderer->getActiveTemplate();
 
-        $paths = [ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR . DIRECTORY_SEPARATOR . "Base"];
+        $paths = [ROOT_PATH . Statics::THEMES_DIR . DIRECTORY_SEPARATOR . "Base"];
 
         /**
          * @var $pluginAccessService PluginAccessService
@@ -108,14 +108,14 @@ class BaseAssetService
         $plugins = $pluginAccessService->getActive();
 
         foreach ($plugins as $plugin) {
-            $viewsDir = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin->getName() . DIRECTORY_SEPARATOR . Statics::VIEW_DIR;
+            $viewsDir = ROOT_PATH . Statics::PLUGINS_DIR . DIRECTORY_SEPARATOR . $plugin->getName() . DIRECTORY_SEPARATOR . Statics::VIEW_DIR_NAME;
 
             if (file_exists($viewsDir)) {
                 array_push($paths, $viewsDir);
             }
         }
 
-        $templatePath = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR . DIRECTORY_SEPARATOR . $activeTemplate;
+        $templatePath = ROOT_PATH .  Statics::THEMES_DIR . DIRECTORY_SEPARATOR . $activeTemplate;
 
         if (!in_array( $templatePath, $paths)) array_push($paths, $templatePath);
 

@@ -11,11 +11,8 @@ declare(strict_types=1);
 namespace Tests\Auth\Services;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Oforge\Engine\Modules\Auth\Models\User\BackendUser;
-use Oforge\Engine\Modules\Auth\Models\User\User;
 use Oforge\Engine\Modules\Auth\Services\BackendLoginService;
-use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Tests\TestCase;
 
 final class BackendLoginServiceTest extends TestCase
@@ -31,9 +28,9 @@ final class BackendLoginServiceTest extends TestCase
      */
     public function getConnection()
     {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         Oforge()->DB()->getSchemaTool()->dropSchema([$this->em->getClassMetadata(BackendUser::class)]);
-        Oforge()->DB()->initSchema([BackendUser::class], true);
+        Oforge()->DB()->initModelSchemata([BackendUser::class], true);
 
         $testData = [
             "email" => "testuser@oforge.com",

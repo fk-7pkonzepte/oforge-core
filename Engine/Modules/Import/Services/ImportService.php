@@ -8,11 +8,7 @@
 
 namespace Oforge\Engine\Modules\Import\Services;
 
-use function DI\create;
-use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
-use Oforge\Engine\Modules\Core\Helper\Statics;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-
+use Oforge\Engine\Modules\Core\Statics;
 
 /**
  * Class ImportService
@@ -23,7 +19,7 @@ class ImportService
 
     function __construct()
     {
-        $this->metaData = Oforge()->DB()->getManager()->getMetadataFactory()->getAllMetadata();
+        $this->metaData = Oforge()->DB()->getEntityManager()->getMetadataFactory()->getAllMetadata();
         $this->mapping = [];
 
         foreach ($this->metaData as $data) {
@@ -75,13 +71,13 @@ class ImportService
 
                             $element = $model::create($data);
 
-                            Oforge()->DB()->getManager()->persist($element);
+                            Oforge()->DB()->getEntityManager()->persist($element);
                             $count++;
                         }
                     }
                 }
 
-                Oforge()->DB()->getManager()->flush();
+                Oforge()->DB()->getEntityManager()->flush();
                 if ($echo) echo "Included " . $count . " elements. Finish processing!\n\nTo Renaming file to avoid further imports. New filename . _" . $name . ".csv\n\n";
                 fclose($handle);
                 rename($fullPath . $name . ".csv", $fullPath . "_" . $name . ".csv");

@@ -23,7 +23,7 @@ class InternationalizationService
      */
     public function __construct()
     {
-        $this->em = Oforge()->DB()->getManager();
+        $this->em = Oforge()->DB()->getEntityManager();
         $this->repo = $this->em->getRepository(Snippet::class);
     }
 

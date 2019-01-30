@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Modules\Core\Models;
+namespace Oforge\Engine\Modules\Core\Forge\Database;
 
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -40,7 +40,7 @@ class DiscriminatorEntryListener implements EventSubscriber {
      *
      * @return array
      */
-    public function getSubscribedEvents() {
+    public function getSubscribedEvents() : array {
         return [Events::loadClassMetadata];
     }
 

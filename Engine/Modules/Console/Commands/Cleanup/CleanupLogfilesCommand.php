@@ -33,9 +33,9 @@ class CleanupLogfilesCommand extends AbstractCommand {
      */
     public function handle(Input $input, Logger $output) : void {
         if ($input->getOption('days')) {
-            Oforge()->Logger()->cleanupLogfiles((int) $input->getOption('days'));
+            Oforge()->Logger()->cleanupLogFiles((int) $input->getOption('days'));
         } else {
-            Oforge()->Logger()->cleanupLogfiles();
+            Oforge()->Logger()->cleanupLogFiles();
         }
     }
 

@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Modules\TemplateEngine\Services;
 
 use MatthiasMullie\Minify\JS;
-use Oforge\Engine\Modules\Core\Helper\Statics;
+use Oforge\Engine\Modules\Core\Statics;
 
 class JsAssetService extends BaseAssetService
 {
@@ -36,7 +36,7 @@ class JsAssetService extends BaseAssetService
         parent::build();
         $dirs = $this->getAssetsDirectories();
         $hasFilesToMinify = false;
-        
+
         $fileName = "scripts." . bin2hex(openssl_random_pseudo_bytes(16));
 
         $folder = Statics::ASSET_CACHE_DIR . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . $this->key;
@@ -50,9 +50,10 @@ class JsAssetService extends BaseAssetService
 
         //iterate over all plugins, current theme and base theme
         foreach ($dirs as $dir) {
-            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR  . DIRECTORY_SEPARATOR . Statics::ASSETS_JS . DIRECTORY_SEPARATOR;
-            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_IMPORT_JS)) {
-                if ($file = fopen($folder . Statics::ASSETS_IMPORT_JS, "r")) {
+            $folder = $dir . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . Statics::ASSETS_DIR_NAME . DIRECTORY_SEPARATOR . Statics::ASSETS_JS_DIR_NAME . DIRECTORY_SEPARATOR;
+            if (file_exists($folder) && file_exists($folder . Statics::ASSETS_IMPORT_JS_FILE_NAME)) {
+
+                if ($file = fopen($folder . Statics::ASSETS_IMPORT_JS_FILE_NAME, "r")) {
                     while(!feof($file)) {
                         $line = trim(fgets($file));
 
@@ -69,10 +70,10 @@ class JsAssetService extends BaseAssetService
         if ($hasFilesToMinify) {
             $minifier = new JS($outputFull . ".js");
             $minifier->minify($outputFull . ".min.js");
-    
+
             $this->store->set($this->getAccessKey($scope), $output . ".min.js");
             $this->removeOldAssets($fullFolder, $fileName ,".js");
-    
+
             return $output . ".min.js";
         }
         return "";
