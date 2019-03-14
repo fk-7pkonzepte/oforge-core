@@ -114,10 +114,14 @@ class EndpointService {
             if ($this->isValid($config)) {
                 $controller = $config['controller'];
                 $scope      = ArrayHelper::get($config, 'asset_scope', 'frontend');
-                $order      = ArrayHelper::get( $config, 'order', 1337 );
+                $order      = ArrayHelper::get($config, 'order', 1337);
                 $methods    = ArrayHelper::get($config, 'methods', []);
 
                 $classMethods = get_class_methods($config['controller']);
+                if (is_null($classMethods)) {
+                    Oforge()->Logger()->get()->error("Retrieving methods of class '$config[controller]' failed", $config);
+                    continue;
+                }
                 if (!empty($methods)) {
                     $classMethods = array_intersect(array_keys($methods), $classMethods);
                 }
@@ -149,7 +153,7 @@ class EndpointService {
                         'controller'  => $controllerMethod,
                         'asset_scope' => $scope,
                         'http_method' => $httpMethod,
-                        'order'       => $order
+                        'order'       => $order,
                     ];
                 }
             }

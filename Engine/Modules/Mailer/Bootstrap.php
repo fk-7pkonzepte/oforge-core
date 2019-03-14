@@ -25,7 +25,7 @@ class Bootstrap extends AbstractBootstrap {
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    public function install() {
+    public function activate() {
         /** @var $configService ConfigService */
         $configService = Oforge()->Services()->get('config');
         $configService->add([

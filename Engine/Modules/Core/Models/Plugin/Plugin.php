@@ -13,14 +13,14 @@ use Oforge\Engine\Modules\Core\Statics;
  */
 class Plugin extends AbstractModel {
     /**
-     * @var int
+     * @var int $id
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
     /**
-     * @var string
+     * @var string $name
      * @ORM\Column(name="name", type="string", nullable=false, unique=true)
      */
     private $name;
@@ -99,10 +99,10 @@ class Plugin extends AbstractModel {
     }
 
     /**
-     * @return AbstractBootstrap
+     * @return AbstractBootstrap|null
      */
-    public function getBootstrapInstance() : AbstractBootstrap {
-        if (is_null($this->bootstrapInstance)) {
+    public function getBootstrapInstance() : ?AbstractBootstrap {
+        if (is_null($this->bootstrapInstance) && class_exists($this->bootstrapClass)) {
             $this->bootstrapInstance = new $this->bootstrapClass();
         }
 
@@ -114,8 +114,10 @@ class Plugin extends AbstractModel {
      *
      * @return Plugin
      */
-    protected function setBootstrapInstance(AbstractBootstrap $bootstrapInstance) : Plugin {
-        $this->bootstrapInstance = $bootstrapInstance;
+    public function setBootstrapInstance(AbstractBootstrap $bootstrapInstance) : Plugin {
+        if (is_null($this->bootstrapInstance)) {
+            $this->bootstrapInstance = $bootstrapInstance;
+        }
 
         return $this;
     }
@@ -132,7 +134,7 @@ class Plugin extends AbstractModel {
      *
      * @return Plugin
      */
-    public function setInstalled(bool $installed) : Plugin {
+    public function setInstalled(bool $installed = true) : Plugin {
         $this->installed = $installed;
 
         return $this;
@@ -150,7 +152,7 @@ class Plugin extends AbstractModel {
      *
      * @return Plugin
      */
-    public function setActive(bool $active) : Plugin {
+    public function setActive(bool $active = true) : Plugin {
         $this->active = $active;
 
         return $this;

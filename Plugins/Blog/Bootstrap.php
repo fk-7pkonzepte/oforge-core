@@ -34,11 +34,12 @@ class Bootstrap extends AbstractBootstrap {
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    public function install() {
+    public function activate() {
         /**
          * @var $testService TestService
          */
         $testService = Oforge()->Services()->get("test.test");
         $testService->addTestData();
     }
+
 }

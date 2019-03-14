@@ -2,8 +2,7 @@
 
 namespace Oforge\Engine\Modules\AdminBackendPlugins;
 
-use Oforge\Engine\Modules\AdminBackend\Controller\Backend\LoginController;
-use Oforge\Engine\Modules\AdminBackendPlugin\Controller\Backend\PluginController;
+use Oforge\Engine\Modules\AdminBackendPlugins\Controller\Backend\PluginController;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 
 
@@ -17,12 +16,15 @@ class Bootstrap extends AbstractBootstrap
         $this->endpoints = [
             "/backend/plugins" => ["controller" => PluginController::class, "name" => "backend_plugins", "asset_scope" => "Backend"]
         ];
+        $this->dependencies = [
+            \Oforge\Engine\Modules\AdminBackend\Bootstrap::class,
+        ];
     }
 
     /**
      *
      */
-    public function install()
+    public function activate()
     {
         $sidebarNavigation = Oforge()->Services()->get("backend.navigation");
 

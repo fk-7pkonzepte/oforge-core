@@ -40,33 +40,22 @@ class Bootstrap extends AbstractBootstrap {
 
         // TODO refactor after boostrap refactoring
         $entityManager    = Oforge()->DB()->getEntityManager();
-        $moduleRepository = $entityManager->getRepository(Module::class);
         $pluginRepository = $entityManager->getRepository(Plugin::class);
-        /**
-         * @var Module[] $modules
-         */
-        $modules = $moduleRepository->findBy(['active' => 1], ['order' => 'ASC']);
-        $moduleRepository->clear();
 
+        /** @var Module[] $modules */
+        $modules = Oforge()->ModuleManager()->getActiveModules();
         foreach ($modules as $module) {
-            $bootstrapName = $module->getName();
-            /**
-             * @var AbstractBootstrap $instance
-             */
-            $instance          = new $bootstrapName();
+            $instance = $module->getBootstrapInstance();
+
             $cronjobClassNames = array_merge($cronjobClassNames, $instance->getCronjobs());
         }
-        /**
-         * @var Plugin[] $plugins
-         */
+        /** @var Plugin[] $plugins */
         $plugins = $pluginRepository->findBy(['active' => 1], ['order' => 'ASC']);
         $pluginRepository->clear();
         foreach ($plugins as $plugin) {
-            $bootstrapName = $plugin->getName() . '\Bootstrap';
-            /**
-             * @var AbstractBootstrap $instance
-             */
-            $instance          = new $bootstrapName();
+            $bootstrapClass = $plugin->getBootstrapClass();
+            /**@var AbstractBootstrap $instance */
+            $instance          = new $bootstrapClass();
             $cronjobClassNames = array_merge($cronjobClassNames, $instance->getCronjobs());
         }
 
@@ -86,16 +75,15 @@ class Bootstrap extends AbstractBootstrap {
 
         /** @var ConfigService $configService */
         $configService = Oforge()->Services()->get('config');
-        // TODO uncomment after configservice refactoring
-        // $configService->add([
-        //     'name'     => CronjobSettings::LOGFILE_DAYS,
-        //     'label'    => CronjobSettings::LOGFILE_DAYS,
-        //     'type'     => 'number',
-        //     'value'    => 14,
-        //     'required' => true,
-        //     'default'  => 14,
-        //     'group'    => 'system'
-        // ]);
+        $configService->add([
+            'name'     => CronjobStatics::SETTING_LOGFILE_DAYS,
+            'label'    => CronjobStatics::SETTING_LOGFILE_DAYS,
+            'type'     => 'number',
+            'value'    => 14,
+            'required' => true,
+            'default'  => 14,
+            'group'    => 'system',
+        ]);
     }
 
 }

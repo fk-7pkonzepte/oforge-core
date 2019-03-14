@@ -34,7 +34,7 @@ class Bootstrap extends AbstractBootstrap
         ];
 
         $this->middleware = [
-            "*" => ["class" => BackendSecureMiddleware::class, "position" => 1]
+            "*" => ["class" => BackendSecureMiddleware::class, "order" => 1]
         ];
 
         $this->models = [
@@ -47,7 +47,7 @@ class Bootstrap extends AbstractBootstrap
     /**
      *
      */
-    public function install()
+    public function activate()
     {
         /**
          * @var $configService ConfigService

@@ -60,4 +60,31 @@ class ForgeSettings {
         return isset($this->settings[$key]) ? $this->settings[$key] : $default;
     }
 
+    /**
+     * Compare value with expected value.
+     *
+     * @param string $key
+     * @param mixed $expectedValue Expected value to compare.
+     * @param mixed $default Default value if value not set.
+     *
+     * @return bool
+     */
+    public function is(string $key, $expectedValue, $default = []) : bool {
+        return $this->get($key, $default) === $expectedValue;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDevelopmentMode() : bool {
+        return $this->is('mode', 'development');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProductionMode() : bool {
+        return $this->is('mode', 'production');
+    }
+
 }

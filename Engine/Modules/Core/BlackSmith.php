@@ -2,15 +2,15 @@
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractTemplateManager;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractViewManager;
-use Oforge\Engine\Modules\Core\Forge\ForgeSlimApp;
 use Oforge\Engine\Modules\Core\Forge\Database\ForgeDatabase;
 use Oforge\Engine\Modules\Core\Forge\ForgeSettings;
-use Oforge\Engine\Modules\Core\Manager\BootManager\BootManager;
+use Oforge\Engine\Modules\Core\Forge\ForgeSlimApp;
+use Oforge\Engine\Modules\Core\Manager\Bootstrap\BootstrapManager;
 use Oforge\Engine\Modules\Core\Manager\Logger\LoggerManager;
 use Oforge\Engine\Modules\Core\Manager\Modules\ModuleManager;
-use Oforge\Engine\Modules\Core\Manager\Plugins\PluginManager;
 use Oforge\Engine\Modules\Core\Manager\Routes\RouteManager;
 use Oforge\Engine\Modules\Core\Manager\Services\ServiceManager;
+use Oforge\Engine\plugins\Core\Manager\Plugins\PluginManager;
 
 // TODO: find a better way to use a TemplateEngine Module
 
@@ -32,9 +32,11 @@ class BlackSmith {
      */
     private $app = null;
     /**
-     * @var BootManager $bootManager
+     * BootstrapManager
+     *
+     * @var BootstrapManager $bootstrapManager
      */
-    private $bootManager = null;
+    private $bootstrapManager = null;
     /**
      * Container
      *
@@ -53,6 +55,12 @@ class BlackSmith {
      * @var LoggerManager $logger
      */
     private $logger = null;
+    /**
+     * ModuleManager
+     *
+     * @var ModuleManager $moduleManager
+     */
+    private $moduleManager;
     /**
      * PluginManager
      *
@@ -111,7 +119,7 @@ class BlackSmith {
     }
 
     /**
-     * @return \Oforge\Engine\Modules\Core\Forge\ForgeSlimApp
+     * @return ForgeSlimApp
      */
     public function App() : ForgeSlimApp {
         if (!isset($this->app)) {
@@ -122,14 +130,14 @@ class BlackSmith {
     }
 
     /**
-     * @return BootManager
+     * @return BootstrapManager
      */
-    public function getBootManager() : BootManager {
-        if (!isset($this->bootManager)) {
+    public function getBootstrapManager() : BootstrapManager {
+        if (!isset($this->bootstrapManager)) {
             throw new \RuntimeException(self::INIT_RUNTIME_EXCEPTION_MESSAGE);
         }
 
-        return $this->bootManager;
+        return $this->bootstrapManager;
     }
 
     /**
@@ -166,9 +174,20 @@ class BlackSmith {
     }
 
     /**
+     * @return ModuleManager
+     */
+    public function ModuleManager() : ModuleManager {
+        if (!isset($this->moduleManager)) {
+            throw new RuntimeException(self::INIT_RUNTIME_EXCEPTION_MESSAGE);
+        }
+
+        return $this->moduleManager;
+    }
+
+    /**
      * @return PluginManager
      */
-    public function Plugins() : PluginManager {
+    public function PluginMangager() : PluginManager {
         if (!isset($this->pluginManager)) {
             throw new RuntimeException(self::INIT_RUNTIME_EXCEPTION_MESSAGE);
         }
@@ -260,16 +279,16 @@ class BlackSmith {
         $this->container = $this->App()->getContainer();
 
         // Init modules and plugins
-        $this->bootManager = BootManager::getInstance();
-        $this->bootManager->init();
+        $this->bootstrapManager = BootstrapManager::getInstance();
+        $this->bootstrapManager->init();
 
-        // // Init and load modules
-        // $modules = ModuleManager::getInstance();
-        // $modules->init();
-        //
+        // Init and load modules
+        $this->moduleManager = ModuleManager::getInstance();
+        $this->moduleManager->init();
+
         // // Init and load plugins
-        // $this->pluginManager = PluginManager::getInstance();
-        // $this->pluginManager->init();
+        $this->pluginManager = PluginManager::getInstance();
+        $this->pluginManager->init();
 
         // Init route manager
         $this->router = RouteManager::getInstance();

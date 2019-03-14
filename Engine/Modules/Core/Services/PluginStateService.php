@@ -63,44 +63,6 @@ class PluginStateService
     }
     
     /**
-     * Register the plugin in the core.
-     * The plugin gets stored in a database table but doesn't get activated or "installed"
-     *
-     * @param $pluginName
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
-     * @throws \Oforge\Engine\Modules\Core\Exceptions\InvalidClassException
-     */
-    public function register($pluginName) {
-        /**
-         * @var $plugin Plugin
-         */
-        $plugin = $this->repo->findOneBy(["name" => $pluginName]);
-        if (!isset($plugin)) {
-            $instance = Helper::getBootstrapInstance($pluginName);
-            if (isset($instance)) {
-                $pluginMiddlewares = $instance->getMiddleware();
-                $plugin = Plugin::create(array("name" => $pluginName, "active" => 0, "installed" => 0, "order" => $instance->getOrder()));
-                $this->em->persist($plugin);
-                $this->em->flush();
-                if(isset($pluginMiddlewares) && is_array($pluginMiddlewares) && sizeof($pluginMiddlewares) > 0) {
-                    
-                    /**
-                     * @var $middlewaresService MiddlewareService
-                     */
-                    $middlewaresService = Oforge()->Services()->get("middleware");
-                    $middlewares = $middlewaresService->register($pluginMiddlewares, $plugin);
-                    $plugin->setMiddlewares($middlewares);
-                }
-                $this->em->persist($plugin);
-                $this->em->flush();
-            }
-        }
-    }
-    
-    /**
      * check if the plugin is installed
      * check if the plugin has a separate model or changes a model / schema
      * install

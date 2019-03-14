@@ -93,10 +93,10 @@ class Module extends AbstractModel {
     }
 
     /**
-     * @return AbstractBootstrap
+     * @return AbstractBootstrap|null
      */
-    public function getBootstrapInstance() : AbstractBootstrap {
-        if (is_null($this->bootstrapInstance)) {
+    public function getBootstrapInstance() : ?AbstractBootstrap {
+        if (is_null($this->bootstrapInstance) && class_exists($this->bootstrapClass)) {
             $this->bootstrapInstance = new $this->bootstrapClass();
         }
 
@@ -108,8 +108,10 @@ class Module extends AbstractModel {
      *
      * @return Module
      */
-    protected function setBootstrapInstance(AbstractBootstrap $bootstrapInstance) : Module {
-        $this->bootstrapInstance = $bootstrapInstance;
+    public function setBootstrapInstance(AbstractBootstrap $bootstrapInstance) : Module {
+        if (is_null($this->bootstrapInstance)) {
+            $this->bootstrapInstance = $bootstrapInstance;
+        }
 
         return $this;
     }
@@ -126,7 +128,7 @@ class Module extends AbstractModel {
      *
      * @return Module
      */
-    public function setInstalled(bool $installed) : Module {
+    public function setInstalled(bool $installed = true) : Module {
         $this->installed = $installed;
 
         return $this;
@@ -144,7 +146,7 @@ class Module extends AbstractModel {
      *
      * @return Module
      */
-    public function setActive(bool $active) : Module {
+    public function setActive(bool $active = true) : Module {
         $this->active = $active;
 
         return $this;

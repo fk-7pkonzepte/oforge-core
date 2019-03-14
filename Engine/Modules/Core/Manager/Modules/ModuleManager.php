@@ -2,253 +2,234 @@
 
 namespace Oforge\Engine\Modules\Core\Manager\Modules;
 
+use Doctrine\ORM\EntityRepository;
+use MJS\TopSort\Implementations\StringSort;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
-use Oforge\Engine\Modules\Core\Bootstrap;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
-use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallModuleException;
-use Oforge\Engine\Modules\Core\Helper\Helper;
+use Oforge\Engine\Modules\Core\Bootstrap as CoreBootstrap;
 use Oforge\Engine\Modules\Core\Models\Module\Module;
-use Oforge\Engine\Modules\Core\Statics;
+use Oforge\Engine\Modules\Core\Services\EndpointService;
+use Oforge\Engine\Modules\Core\Services\MiddlewareService;
 
-class ModuleManager
-{
+/**
+ * Class ModuleManager
+ *
+ * @package Oforge\Engine\Modules\Core\Manager\Modules
+ */
+class ModuleManager {
+    /**
+     * @var ModuleManager $instance
+     */
     protected static $instance = null;
-    protected $em = null;
-    protected $entryRepository = null;
-    protected $moduleRepository = null;
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    private $entityManager;
+    /**
+     * @var EntityRepository $moduleRepository
+     */
+    private $moduleRepository;
+    /**
+     * @var Module[] $activeModules
+     */
+    private $activeModules = [];
 
-    protected function __construct()
-    {
-        $this->em = Oforge()->DB()->getEntityManager();
-        $this->moduleRepository = $this->em->getRepository(Module::class);
+    protected function __construct() {
+        $this->entityManager    = Oforge()->DB()->getEntityManager();
+        $this->moduleRepository = $this->entityManager->getRepository(Module::class);
     }
 
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
+    /**
+     * @return ModuleManager
+     */
+    public static function getInstance() : ModuleManager {
+        if (is_null(self::$instance)) {
             self::$instance = new ModuleManager();
         }
+
         return self::$instance;
     }
-    
+
+    /**
+     * @return Module[]
+     */
+    public function getActiveModules() {
+        return $this->activeModules;
+    }
+
     /**
      * Initialize all modules
      *
-     * @throws CouldNotInstallModuleException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
+     * @throws \MJS\TopSort\CircularDependencyException
+     * @throws \MJS\TopSort\ElementNotFoundException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceAlreadyDefinedException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    public function init()
-    {
-        $files = Helper::getBootstrapFiles(ROOT_PATH . Statics::ENGINE_DIR);
+    public function init() {
+        $serviceManager       = Oforge()->Services();
+        $bootstrapManager     = Oforge()->getBootstrapManager();
+        $modulesBootstrapData = $bootstrapManager->getModuleBootstrapData();
 
-        // init core module
-        $this->initCoreModule(Bootstrap::class);
+        /** @var Module[] $moduleList */
+        $moduleList = $this->moduleRepository->findBy([], ['order' => 'ASC']);
+        /** @var array $modulesMap BootstrapClass=>Module map. */
+        $modulesMap = [];
+        /** @var array $tmpDeactivated Temporary map (BootstrapClass=>true) for recursive deactivation process. */
+        $tmpDeactivated = [];
+        /** @var array $mapDeactivated Map (BootstrapClass=>true) of deactivated modules. */
+        $mapDeactivated = [];
+        $mapAdded       = [];
 
-        // register all modules
-        foreach ($files as $key => $dir) {
-            $this->register("\\Oforge\\Engine\\Modules\\" . $key . "\\Bootstrap");
-        }
+        foreach ($moduleList as $index => $module) {
+            if (!isset($modulesBootstrapData[$module->getBootstrapClass()])) {
+                // module does not exist anymore
+                $tmpDeactivated[$module->getBootstrapClass()] = true;
+                $mapDeactivated[$module->getBootstrapClass()] = true;
+                $this->entityManager->remove($module);
+                $this->entityManager->flush($module);
+            } else {
+                // module exist
+                $modulesMap[$module->getBootstrapClass()] = $module;
 
-        // save all db changes
-        $this->em->flush();
-
-        // find all modules order by "order"
-        $modules = $this->moduleRepository->findBy(array("active" => 1), array('order' => 'ASC'));
-
-        // create working bucket with all modules that should be started
-        $bucket = [];
-        // add all modules except of the core bootstrap file
-        foreach ($modules as $module) {
-            /**
-             * @var $module Module
-             */
-            $classname = $module->getName();
-            $instance = new $classname();
-            if (get_class($instance) != Bootstrap::class) {
-                array_push($bucket, $instance);
+                $bootstrapInstance = $bootstrapManager->getBootstrapInstance($module->getBootstrapClass());
+                $module->setBootstrapInstance($bootstrapInstance);
             }
         }
+        // auto deactivate modules with dependencies of removed modules
+        while (!empty($tmpDeactivated)) {
+            reset($tmpDeactivated);
+            $searchedDependent = key($tmpDeactivated);
+            // $searchedDependent = array_key_first($tmpDeactivated); // TODO PHP 7.3
+            unset($tmpDeactivated[$searchedDependent]);
+            foreach ($modulesMap as $bootstrapClass => $module) {
+                /** @var string $bootstrapClass */
+                /** @var Module $module */
+                $bootstrapInstance = $module->getBootstrapInstance();
+                if (is_null($bootstrapInstance)) {
+                    continue;
+                }
+                $moduleDependencies = $bootstrapInstance->getDependencies();
+                if (in_array($searchedDependent, $moduleDependencies)) {
+                    // (one) module dependency is deactivated, deactivate this module
+                    $bootstrapInstance->deactivate();
+                    $tmpDeactivated[$bootstrapClass] = true;
+                    $mapDeactivated[$bootstrapClass] = true;
+                }
+            }
+        }
+        // create new missing modules
+        foreach ($modulesBootstrapData as $bootstrapClass => $bootstrapData) {
+            if (!is_subclass_of($bootstrapClass, AbstractBootstrap::class)) {
+                Oforge()->Logger()->get()->warning("Class '$bootstrapClass' is not subclass of " . AbstractBootstrap::class);
+                continue;
+            }
+            /** @var AbstractBootstrap $bootstrapInstance */
+            $bootstrapInstance = $bootstrapManager->getBootstrapInstance($bootstrapClass);
+            if (is_null($bootstrapInstance)) {
+                continue;
+            }
+            $isCoreBootstrap = ($bootstrapClass === CoreBootstrap::class);
+            if ($isCoreBootstrap) {
+                $serviceManager->register($bootstrapInstance->getServices());
+            }
+            if (!isset($modulesMap[$bootstrapClass])) {
+                if ($isCoreBootstrap) {
+                    $this->registerEndpointsAndMiddleWare($bootstrapInstance);
+                } else {
+                    Oforge()->DB()->initModelSchemata($bootstrapInstance->getModels());
+                }
+                $bootstrapInstance->install();
+                if ($isCoreBootstrap) {
+                    $bootstrapInstance->activate();
+                }
 
-        // create array with all installed module bootstrap classes
-        $installed = [Bootstrap::class => true];
+                $name   = str_replace('\\', ' - ', strtr($bootstrapClass, [
+                    '\\Bootstrap'               => '',
+                    'Oforge\\Engine\\Modules\\' => '',
+                ]));
+                $module = Module::create([
+                    'name'           => $name,
+                    'bootstrapClass' => $bootstrapClass,
+                    'order'          => $bootstrapInstance->getOrder(),
+                    'installed'      => true,
+                    'active'         => $isCoreBootstrap,
+                ]);
+                $this->entityManager->persist($module);
+                $this->entityManager->flush($module);
 
-        // installed bootstrap
-        $count = 0;
-        do {
-            $trash = [];
-            for ($i = 0; $i < sizeof($bucket); $i++) {
-                /**
-                 * @var $instance AbstractBootstrap
-                 */
-                $instance = $bucket[$i];
-                if (sizeof($instance->getDependencies()) > 0) {
-                    $found = true;
+                $modulesMap[$bootstrapClass] = $module;
+                $mapAdded[$bootstrapClass]   = true;
 
-                    foreach ($instance->getDependencies() as $dependency) {
-                        if (!array_key_exists($dependency, $installed) || !$installed[$dependency]) {
-                            $found = false;
+                // add to map of deactivated modules if dependencies are deactivated
+                if (!empty($bootstrapInstance->getDependencies())) {
+                    foreach ($bootstrapInstance->getDependencies() as $dependency) {
+                        if (isset($mapDeactivated[$dependency])) {
+                            $mapDeactivated[$bootstrapClass] = true;
                             break;
                         }
                     }
-
-                    if ($found) {
-                        $classname = get_class($instance);
-                        $this->initModule(get_class($instance));
-                        $installed[$classname] = true;
-                    } else {
-                        array_push($trash, $instance);
-                    }
-
-                } else {
-                    $classname = get_class($instance);
-                    $this->initModule(get_class($instance));
-                    $installed[$classname] = true;
                 }
             }
-
-            $bucket = $trash;
-            if ($count++ > 10) {
-                break;
-            }
-        } while (sizeof($bucket) > 0);  // do it until everything is installed
-
-        if (sizeof($bucket) > 0) {
-            throw new CouldNotInstallModuleException(get_class($bucket[0]), $bucket[0]->getDependencies());
         }
+        // topsort $modulesMap by dependencies
+        $sorter = new StringSort();
+        foreach ($modulesMap as $bootstrapClass => $module) {
+            $bootstrapInstance = $module->getBootstrapInstance();
+            $sorter->add($bootstrapClass, $bootstrapInstance->getDependencies());
+        }
+        $sortedList = $sorter->sort();
+        foreach ($sortedList as $bootstrapClass) {
+            /** @var Module $module */
+            $module = $modulesMap[$bootstrapClass];
+            /** @var AbstractBootstrap $bootstrapInstance */
+            $bootstrapInstance = $module->getBootstrapInstance();
+            if ($bootstrapClass === CoreBootstrap::class) {
+                $bootstrapInstance->load();
+                continue;
+            }
+            if (isset($mapDeactivated[$bootstrapClass])) {
+                continue;
+            }
+            $serviceManager->register($bootstrapInstance->getServices());
+            // auto activate all inactive new modules
+            if (!$module->isActive() && isset($mapAdded[$bootstrapClass])) {
+                $bootstrapInstance->activate();
+                $module->setActive();
+            }
+            if ($module->isActive()) {
+                $this->registerEndpointsAndMiddleWare($bootstrapInstance);
+                $bootstrapInstance->load();
+                $this->activeModules[] = $module;
+            } else {
+                unset($modulesMap[$bootstrapClass]);
+            }
+            if (!$this->entityManager->contains($module)) {
+                $this->entityManager->merge($module);
+            }
+        }
+        $this->entityManager->flush();
+        $this->moduleRepository->clear();
     }
-    
+
     /**
-     * Initialize the core module
-     *
-     * @param $className
+     * @param AbstractBootstrap $bootstrapInstance
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceAlreadyDefinedException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    private function initCoreModule($className)
-    {
-        if (is_subclass_of($className, AbstractBootstrap::class)) {
-
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
-
-
-            Oforge()->DB()->initModelSchemata($instance->getModels());
-
-            $services = $instance->getServices();
-            Oforge()->Services()->register($services);
-
-            $endpoints = $instance->getEndpoints();
-            Oforge()->Services()->get('endpoint')->register($endpoints);
-
-            /**
-             * @var $entry Module
-             */
-            $entry = $this->moduleRepository->findOneBy(["name" => $className]);
-
-            if (isset($entry) && !$entry->isInstalled()) {
-                try {
-                    $instance->install();
-                } catch(ConfigElementAlreadyExistException $e) {
-
-                }
-                $this->em->persist($entry->setInstalled(true));
-            } else if (!isset($entry)) {
-                $this->register($className);
-                try {
-                    $instance->install();
-                } catch(ConfigElementAlreadyExistException $e) {
-
-                }
-                $entry = $this->moduleRepository->findOneBy(["name" => $className]);
-                $this->em->persist($entry->setInstalled(true));
-            }
-
-            $instance->activate();
-
-            $this->em->flush();
-        }
+    protected function registerEndpointsAndMiddleWare(AbstractBootstrap $bootstrapInstance) {
+        $serviceManager = Oforge()->Services();
+        /** @var EndpointService $endpointService */
+        $endpointService = $serviceManager->get('endpoint');
+        $endpointService->register($bootstrapInstance->getEndpoints());
+        /** @var MiddlewareService $middlewareService */
+        $middlewareService = $serviceManager->get('middleware');
+        $middlewareService->registerFromModule($bootstrapInstance->getMiddleware());
     }
 
-    /**
-     * Register a module.
-     * This means: if a module isn't found in the db table, insert it
-     *
-     * @param $className
-     *
-     * @throws \Doctrine\ORM\ORMException
-     */
-    protected function register($className)
-    {
-        if (is_subclass_of($className, AbstractBootstrap::class)) {
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
-
-            $moduleEntry = $this->moduleRepository->findBy(["name" => get_class($instance)]);
-            if (isset($moduleEntry) && sizeof($moduleEntry) > 0) {
-                //found -> nothing to do;
-            } else { // if not put the data into the database
-                $newEntry = Module::create(["name" => get_class($instance), "order" => $instance->getOrder(), "active" => 1, "installed" => 0]);
-                $this->em->persist($newEntry);
-            }
-        }
-    }
-    
-    /**
-     * Initialize a module
-     *
-     * @param $className
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceAlreadyDefinedException
-     * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
-     */
-    protected function initModule($className)
-    {
-        if (is_subclass_of($className, AbstractBootstrap::class)) {
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
-
-            Oforge()->DB()->initModelSchemata($instance->getModels());
-
-            $services = $instance->getServices();
-            Oforge()->Services()->register($services);
-
-            $endpoints = $instance->getEndpoints();
-            Oforge()->Services()->get('endpoint')->register($endpoints);
-
-            $middleware = $instance->getMiddleware();
-            Oforge()->Services()->get('middleware')->registerFromModule($middleware);
-
-            /**
-             * @var $entry Module
-             */
-            $entry = $this->moduleRepository->findOneBy(["name" => $className]);
-
-            if (isset($entry) && !$entry->isInstalled()) {
-                try {
-                    $instance->install();
-                } catch(ConfigElementAlreadyExistException $e) {
-
-                }
-                $this->em->persist($entry->setInstalled(true));
-            }
-
-            $instance->activate();
-
-            $this->em->flush();
-        }
-    }
 }

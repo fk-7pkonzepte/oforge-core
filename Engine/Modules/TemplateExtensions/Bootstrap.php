@@ -24,6 +24,9 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function activate()
     {
+    }
+
+    public function load() {
         /**
          * @var $templateRenderer TemplateRenderService
          */

@@ -18,18 +18,18 @@ class MiddlewareService
         $em = Oforge()->DB()->getEntityManager();
         $repo = $em->getRepository(Middleware::class);
 
-        $middlewares = $repo->findBy(["name" => [$name, "*", $name . "*"], "active" => 1], ['position' => 'DESC']);
+        $middlewares = $repo->findBy(["name" => [$name, "*", $name . "*"], "active" => 1], ['order' => 'DESC']);
 
         return $middlewares;
     }
     
     /**
      * @param $options
-     * @param $middleware
+     * @param $plugin
      *
      * @return Middleware[]
      */
-    public function register($options, $middleware)
+    public function register($options, $plugin)
     {
         /**
          * @var $result Middleware[]
@@ -46,8 +46,8 @@ class MiddlewareService
 
                     $element = $repo->findOneBy(["class" => $option["class"]]);
                     if(!isset($element)) {
-                        $element = Middleware::create(["name" => $key,  "class" => $option["class"], "position" => $option["position"]]);
-                        $element->setPlugin($middleware);
+                        $element = Middleware::create(["name" => $key,  "class" => $option["class"], "order" => $option["order"]]);
+                        $element->setPlugin($plugin);
                     }
 
                     array_push($result, $element);
@@ -77,7 +77,7 @@ class MiddlewareService
 
                     $element = $repo->findOneBy(["class" => $option["class"]]);
                     if(!isset($element)) {
-                        $element = Middleware::create(["name" => $key,  "class" => $option["class"], "active" => 1, "position" => $option["position"]]);
+                        $element = Middleware::create(["name" => $key,  "class" => $option["class"], "active" => 1, "order" => $option["order"]]);
                         Oforge()->DB()->getEntityManager()->persist($element);
                     }
                 }
@@ -105,8 +105,8 @@ class MiddlewareService
         /*
          * Check if correct type are set
          */
-        if (isset($options["position"]) && !is_integer($options["position"])) {
-            throw new \InvalidArgumentException("Position value should be of type integer. ");
+        if (isset($options["order"]) && !is_integer($options["order"])) {
+            throw new \InvalidArgumentException("Order value should be of type integer. ");
         }
         return true;
     }

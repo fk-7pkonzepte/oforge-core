@@ -21,7 +21,7 @@ class Bootstrap extends AbstractBootstrap
     /**
      *
      */
-    public function install()
+    public function activate()
     {
         /**
          * @var $sidebarNavigation BackendNavigationService

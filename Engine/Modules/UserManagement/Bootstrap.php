@@ -46,7 +46,7 @@ class Bootstrap extends AbstractBootstrap {
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ParentNotFoundException
      * @throws \Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException
      */
-    public function install() {
+    public function activate() {
         /**
          * @var $backendNavigation BackendNavigationService
          */

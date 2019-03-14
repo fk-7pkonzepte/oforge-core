@@ -27,14 +27,15 @@ class ForgeSlimApp extends SlimApp {
         $container['errorHandler'] = function ($container) {
             return function ($request, $response, $exception) use ($container) {
                 /** @var Response $response */
-                return $response->withStatus(500)->withHeader('Content-Type', 'text/html')->write($exception);
+                /** @var \Exception $exception */
+                return $response->withStatus(500)->withHeader('Content-Type', 'text/html')->write($this->exceptionToString($exception));
             };
         };
 
         $container['phpErrorHandler'] = function ($container) {
             return function ($request, $response, $exception) use ($container) {
                 /** @var Response $response */
-                return $response->withStatus(500)->withHeader('Content-Type', 'text/html')->write($exception);
+                return $response->withStatus(500)->withHeader('Content-Type', 'text/html')->write($this->exceptionToString($exception));
             };
         };
 
@@ -52,6 +53,15 @@ class ForgeSlimApp extends SlimApp {
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @param \Exception $exception
+     *
+     * @return string
+     */
+    private function exceptionToString(\Exception $exception) {
+        return $exception->getMessage() . "<br/><pre>" . $exception->getTraceAsString() . "</pre>";
     }
 
 }

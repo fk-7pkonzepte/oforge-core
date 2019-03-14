@@ -218,24 +218,16 @@ class ConsoleService {
 
         // TODO refactor after boostrap refactoring
         $entityManager    = Oforge()->DB()->getEntityManager();
-        $moduleRepository = $entityManager->getRepository(Module::class);
         $pluginRepository = $entityManager->getRepository(Plugin::class);
-        /**
-         * @var Module[] $modules
-         */
-        $modules = $moduleRepository->findBy(['active' => 1], ['order' => 'ASC']);
-        $moduleRepository->clear();
+
+        /** @var Module[] $modules */
+        $modules = Oforge()->ModuleManager()->getActiveModules();
         foreach ($modules as $module) {
-            $bootstrapName = $module->getName();
-            /**
-             * @var AbstractBootstrap $instance
-             */
-            $instance          = new $bootstrapName();
+            $instance = $module->getBootstrapInstance();
+
             $commandClassNames = array_merge($commandClassNames, $instance->getCommands());
         }
-        /**
-         * @var Plugin[] $plugins
-         */
+        /** @var Plugin[] $plugins */
         $plugins = $pluginRepository->findBy(['active' => 1], ['order' => 'ASC']);
         $pluginRepository->clear();
         foreach ($plugins as $plugin) {
