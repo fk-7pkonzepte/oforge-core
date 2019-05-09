@@ -44,7 +44,7 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->middlewares = [
-            'backend' => ['class' => BackendSecureMiddleware::class, 'position' => 1],
+            'backend' => ['class' => BackendSecureMiddleware::class, 'order' => 1],
         ];
 
         $this->models = [

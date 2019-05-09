@@ -11,13 +11,9 @@ use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
  * @package Oforge\Engine\Modules\Core\Manager\Services
  */
 class ServiceManager {
-    /**
-     * @var ServiceManager $instance
-     */
+    /** @var ServiceManager $instance */
     protected static $instance = null;
-    /**
-     * @var array $services
-     */
+    /** @var array $services */
     protected $services = [];
 
     protected function __construct() {
@@ -26,7 +22,7 @@ class ServiceManager {
     /**
      * @return ServiceManager
      */
-    public static function getInstance() {
+    public static function getInstance() : ServiceManager {
         if (null === self::$instance) {
             self::$instance = new ServiceManager();
         }
@@ -89,7 +85,6 @@ class ServiceManager {
     }
 
     protected function __clone() {
-
     }
 
 }

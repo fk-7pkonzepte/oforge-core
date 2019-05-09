@@ -7,56 +7,55 @@ use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
 use Oforge\Engine\Modules\Core\Helper\Statics;
 
 /**
- * @ORM\Table(name="oforge_core_endpoints")
  * @ORM\Entity
+ * @ORM\Table(name="oforge_core_endpoints")
  */
 class Endpoint extends AbstractModel {
     /**
-     * @var int
+     * @var int $id
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
     /**
-     * @var bool
+     * @var bool $active
      * @ORM\Column(name="active", type="boolean", nullable=false, options={"default":false})
      */
     private $active = false;
     /**
-     * @var string
-     * @ORM\Column(name="path_name", type="string", nullable=false, unique=true)
+     * @var string $name
+     * @ORM\Column(name="name", type="string", nullable=false)
      */
     private $name;
     /**
-     * @var string
+     * @var string $path
      * @ORM\Column(name="path", type="string", nullable=false)
      */
     private $path;
     /**
-     * @var string
+     * @var string $controllerClass
      * @ORM\Column(name="controller_class", type="string", nullable=false)
      */
     private $controllerClass;
     /**
-     * @var string
+     * @var string $controllerMethod
      * @ORM\Column(name="controller_method", type="string", nullable=false)
      */
     private $controllerMethod;
     /**
-     * @var string
+     * @var string $httpMethod
      * @ORM\Column(name="http", type="string", nullable=false, options={"default":EndpointMethod::ANY})
      */
     private $httpMethod = EndpointMethod::ANY;
     /**
-     * @var string
-     * @ORM\Column(name="asset_scope", type="string", nullable=true, options={"default":"frontend"})
+     * @var string $assetScope
+     * @ORM\Column(name="asset_scope", type="string", nullable=false, options={"default":"frontend"})
      */
     private $assetScope = 'frontend';
-
     /**
-     * @var int
-     * @ORM\Column(name="sort_order", type="integer", nullable=false, options={"default":Statics::DEFAULT_ORDER})
+     * @var int $order
+     * @ORM\Column(name="orderby", type="integer", nullable=false, options={"default":Statics::DEFAULT_ORDER})
      */
     private $order = Statics::DEFAULT_ORDER;
 
@@ -65,17 +64,6 @@ class Endpoint extends AbstractModel {
      */
     public function getId() : int {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return Endpoint
-     */
-    public function setId(int $id) : Endpoint {
-        $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -209,4 +197,5 @@ class Endpoint extends AbstractModel {
     public function setOrder(int $order) : void {
         $this->order = $order;
     }
+
 }

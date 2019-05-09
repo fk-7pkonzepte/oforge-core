@@ -93,12 +93,12 @@ class PluginStateService extends AbstractDatabaseAccess {
                 $plugin = Plugin::create(array("name" => $pluginName, "active" => 0, "installed" => 0, "order" => $instance->getOrder()));
 
                 $this->entityManager()->persist($plugin);
-                $this->entityManager()->flush();
+                $this->entityManager()->flush($plugin);
 
                 if(isset($pluginMiddlewares) && is_array($pluginMiddlewares) && sizeof($pluginMiddlewares) > 0) {
                     /** @var $middlewaresService MiddlewareService */
                     $middlewaresService = Oforge()->Services()->get('middleware');
-                    $middlewaresService->register($pluginMiddlewares, false);
+                    $middlewaresService->install($pluginMiddlewares, false, $plugin);
                 }
             }
         }
@@ -256,7 +256,7 @@ class PluginStateService extends AbstractDatabaseAccess {
             }
 
             foreach ($middlewareNames as $middlewareName) {
-                $middlewareService->activate($middlewareName);
+                $middlewareService->activateMiddleware($middlewareName);
             }
         }
 
@@ -330,7 +330,7 @@ class PluginStateService extends AbstractDatabaseAccess {
             }
 
             foreach ($middlewareNames as $middlewareName) {
-                $middlewareService->deactivate($middlewareName);
+                $middlewareService->deactivateMiddleware($middlewareName);
             }
         }
 

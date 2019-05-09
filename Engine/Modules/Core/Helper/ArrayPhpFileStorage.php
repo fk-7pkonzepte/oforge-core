@@ -8,7 +8,7 @@ namespace Oforge\Engine\Modules\Core\Helper;
  *
  * @package Oforge\Engine\Modules\Core\Helper
  */
-class PhpArrayFileWriter {
+class ArrayPhpFileStorage {
 
     /**
      * Prevent instance.
@@ -17,6 +17,23 @@ class PhpArrayFileWriter {
     }
 
     /**
+     * Load stored array from file.
+     *
+     * @param string $filepath
+     *
+     * @return array
+     */
+    public static function load(string $filepath) : array {
+        if (file_exists($filepath)) {
+            return include($filepath);
+        }
+
+        return [];
+    }
+
+    /**
+     * Store array as php file.
+     *
      * @param string $filepath
      * @param array $data
      *

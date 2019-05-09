@@ -41,11 +41,11 @@ class Bootstrap extends AbstractBootstrap {
         $this->middlewares = [
             'frontend'         => [
                 'class'    => FrontendUserStateMiddleware::class,
-                'position' => 1,
+                'order' => 1,
             ],
             'frontend_account' => [
-                ['class' => FrontendSecureMiddleware::class, 'position' => 1],
-                ['class' => AccountNavigationMiddleware::class, 'position' => 1],
+                ['class' => FrontendSecureMiddleware::class, 'order' => 1],
+                ['class' => AccountNavigationMiddleware::class, 'order' => 1],
             ],
         ];
 

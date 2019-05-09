@@ -11,6 +11,7 @@ use Doctrine\ORM\ORMException;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Modules\Core\Helper\ArrayPhpFileStorage;
 use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Helper\StringHelper;
 use Oforge\Engine\Modules\Core\Models\Endpoint\Endpoint as EndpointModel;
@@ -28,6 +29,9 @@ class EndpointService extends AbstractDatabaseAccess {
     /** @var array $configCache */
     private $configCache = [];
 
+    /**
+     * EndpointService constructor.
+     */
     public function __construct() {
         parent::__construct(EndpointModel::class);
     }
@@ -103,8 +107,6 @@ class EndpointService extends AbstractDatabaseAccess {
     public function deinstall(array $endpoints) {//TODO ungetestet
         $this->iterateEndpointModels($endpoints, function (EndpointModel $endpoint) {
             $this->entityManager()->remove($endpoint);
-
-            return true;
         });
     }
 
@@ -167,14 +169,13 @@ class EndpointService extends AbstractDatabaseAccess {
                 $cacheFile = Statics::ENDPOINT_CACHE_DIR . DIRECTORY_SEPARATOR . $fileName . '.cache';
                 if (file_exists($cacheFile)) {
                     if (!isset($this->configCache[$fileName])) {
-                        $content                      = trim(file_get_contents($fileName));
-                        $this->configCache[$fileName] = unserialize($content);
+                        $this->configCache[$fileName] = ArrayPhpFileStorage::load($cacheFile);
                     }
                     $endpointConfigsForClass = $this->configCache[$fileName];
                 } else {
                     $endpointConfigsForClass      = $this->getEndpointConfigFromClass($reader, $class);
                     $this->configCache[$fileName] = $endpointConfigsForClass;
-                    file_put_contents($cacheFile, serialize($endpointConfigsForClass));
+                    ArrayPhpFileStorage::write($cacheFile, $endpointConfigsForClass);
                 }
             } else {
                 if (!isset($this->configCache[$fileName])) {

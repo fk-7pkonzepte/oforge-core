@@ -37,7 +37,7 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->middlewares = [
-            "*" => ["class" => AssetsMiddleware::class, "position" => 0],
+            "*" => ["class" => AssetsMiddleware::class, "order" => 0],
         ];
 
         $this->order = 1;

@@ -13,6 +13,12 @@ use RecursiveIteratorIterator;
 class FileSystemHelper {
     public const OMIT        = ['.', '..'];
     public const OMIT_OFORGE = ['.', '..', 'var', 'vendor'];
+    /**
+     * Caching of findFiles results.
+     *
+     * @var array $findCache
+     */
+    private static $findCache = [];
 
     /**
      * Prevent instance.
@@ -74,10 +80,7 @@ class FileSystemHelper {
         $result = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path)) as $f) {
             if (strtolower($f->getFileName()) === $searchFileName) {
-                $classpath = str_replace($path . DIRECTORY_SEPARATOR, '', $f->getPath());
-                $classpath = str_replace('.php', '', $classpath);
-
-                $result[$classpath] = $f->getPath() . DIRECTORY_SEPARATOR . $f->getFileName();
+                $result[] = $f->getPath() . DIRECTORY_SEPARATOR . $f->getFileName();
             }
         }
 
@@ -135,20 +138,26 @@ class FileSystemHelper {
     /**
      * Get cached data or find files with filename in path and cache it.
      *
+     * @param string $context
      * @param string $path
      * @param string $filename
      *
      * @return mixed|string[]
      */
     private static function getCachedOrFind(string $path, string $filename) {
-        $cacheFile = ROOT_PATH . Statics::CACHE_DIR . DIRECTORY_SEPARATOR . basename($path) . ".cache";
+        $context = basename($path);
+        if (isset(self::$findCache[$context])) {
+            return self::$findCache[$context];
+        }
+        $cacheFile = ROOT_PATH . Statics::CACHE_DIR . DIRECTORY_SEPARATOR . $context . '.cache.php';
 
         if (file_exists($cacheFile) && Oforge()->Settings()->isProductionMode()) {
-            $result = unserialize(file_get_contents($cacheFile));
+            $result = ArrayPhpFileStorage::load($cacheFile);
         } else {
             $result = self::findFiles($path, $filename);
-            file_put_contents($cacheFile, serialize($result));
+            ArrayPhpFileStorage::write($cacheFile, $result);
         }
+        self::$findCache[$filename] = $result;
 
         return $result;
     }

@@ -96,4 +96,38 @@ class StringHelper {
         return $string;
     }
 
+    /**
+     * Trim string suffix.
+     *
+     * @param string $string
+     * @param string $suffix
+     *
+     * @return string
+     */
+    public static function rightTrim(string $string, string $suffix) : string {
+        $length = strlen($suffix);
+        if ($length !== 0 && substr($string, -$length) === $suffix) {
+            return substr($string, 0, -$length);
+        }
+
+        return $string;
+    }
+
+    /**
+     * Trim string prefix.
+     *
+     * @param string $string
+     * @param string $prefix
+     *
+     * @return string
+     */
+    public static function leftTrim(string $string, string $prefix) : string {
+        $length = strlen($prefix);
+        if ($length !== 0 && substr($string, 0, $length) === $prefix) {
+            return substr($string, $length);
+        }
+
+        return $string;
+    }
+
 }

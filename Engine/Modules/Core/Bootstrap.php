@@ -2,6 +2,8 @@
 
 namespace Oforge\Engine\Modules\Core;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Controller\Frontend\NotFoundController;
 use Oforge\Engine\Modules\Core\Models\Config\Element;
@@ -44,22 +46,26 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->services = [
-            'plugin.state'       => PluginStateService::class,
-            'plugin.access'      => PluginAccessService::class,
-            'endpoints'          => EndpointService::class,
             'config'             => ConfigService::class,
+            'endpoint'          => EndpointService::class,
             'middleware'         => MiddlewareService::class,
-            'store.keyvalue'     => KeyValueStoreService::class,
             'ping'               => PingService::class,
+            'plugin.access'      => PluginAccessService::class,
+            'plugin.state'       => PluginStateService::class,
             'redirect'           => RedirectService::class,
             'session.management' => SessionManagementService::class,
+            'store.keyvalue'     => KeyValueStoreService::class,
         ];
 
         $this->order = 0;
     }
 
     /**
-     *
+     * @throws Exceptions\ConfigElementAlreadyExistsException
+     * @throws Exceptions\ConfigOptionKeyNotExistsException
+     * @throws Exceptions\ServiceNotFoundException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function install() {
         /** @var ConfigService $configService */

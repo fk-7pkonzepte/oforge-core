@@ -3,95 +3,124 @@
 namespace Oforge\Engine\Modules\Core\Models\Module;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractModel;
+use Oforge\Engine\Modules\Core\Helper\Statics;
 
 /**
- * @ORM\Table(name="oforge_core_module")
  * @ORM\Entity
+ * @ORM\Table(name="oforge_core_module")
  */
-class Module extends AbstractModel
-{
+class Module extends AbstractModel {
     /**
-     * @var int
+     * @var int $id
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
     /**
-     * @var string
-     * @ORM\Column(name="class_path", type="string", nullable=false)
+     * @var string $name
+     * @ORM\Column(name="name", type="string", nullable=false, unique=true)
      */
     private $name;
-
     /**
-     * @var bool
-     * @ORM\Column(name="active", type="boolean")
+     * @var string $bootstrapClass
+     * @ORM\Column(name="bootstrap_class", type="string", nullable=false, unique=true)
      */
-    private $active = false;
-
+    private $bootstrapClass;
     /**
-     * @var bool
-     * @ORM\Column(name="installed", type="boolean")
+     * @var AbstractBootstrap $bootstrapInstance
+     */
+    private $bootstrapInstance;
+    /**
+     * @var bool $installed
+     * @ORM\Column(name="installed", type="boolean", options={"default":false})
      */
     private $installed = false;
-
     /**
-     * @var int
-     * @ORM\Column(name="sort_order", type="integer", nullable=true)
+     * @var bool $active
+     * @ORM\Column(name="active", type="boolean", options={"default":false})
      */
-    private $order;
+    private $active = false;
+    /**
+     * @var int $order
+     * @ORM\Column(name="orderby", type="integer", options={"default":Statics::DEFAULT_ORDER})
+     */
+    private $order = Statics::DEFAULT_ORDER;
 
     /**
-     * Get id
-     *
      * @return int
      */
-    public function getId()
-    {
+    public function getId() : int {
         return $this->id;
     }
 
     /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Module
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() : string {
         return $this->name;
     }
 
     /**
-     * @param bool $active
+     * @param string $name
      *
      * @return Module
      */
-    public function setActive($active)
-    {
-        $this->active = $active;
+    public function setName(string $name) : Module {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBootstrapClass() : string {
+        return $this->bootstrapClass;
+    }
+
+    /**
+     * @param string $bootstrapClass
+     *
+     * @return Module
+     */
+    protected function setBootstrapClass(string $bootstrapClass) : Module {
+        $this->bootstrapClass = $bootstrapClass;
+
+        return $this;
+    }
+
+    /**
+     * @return AbstractBootstrap|null
+     */
+    public function getBootstrapInstance() : ?AbstractBootstrap {
+        if (is_null($this->bootstrapInstance) && class_exists($this->bootstrapClass)) {
+            $this->bootstrapInstance = new $this->bootstrapClass();
+        }
+
+        return $this->bootstrapInstance;
+    }
+
+    /**
+     * @param AbstractBootstrap $bootstrapInstance
+     *
+     * @return Module
+     */
+    public function setBootstrapInstance(AbstractBootstrap $bootstrapInstance) : Module {
+        if (is_null($this->bootstrapInstance)) {
+            $this->bootstrapInstance = $bootstrapInstance;
+        }
+
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getActive()
-    {
-        return $this->active;
+    public function isInstalled() : bool {
+        return $this->installed;
     }
 
     /**
@@ -99,36 +128,46 @@ class Module extends AbstractModel
      *
      * @return Module
      */
-    public function setInstalled($installed)
-    {
+    public function setInstalled(bool $installed = true) : Module {
         $this->installed = $installed;
+
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getInstalled()
-    {
-        return $this->installed;
+    public function isActive() : bool {
+        return $this->active;
     }
 
     /**
-     * @param bool $order
+     * @param bool $active
      *
      * @return Module
      */
-    public function setOrder($order)
-    {
-        $this->order = $order;
+    public function setActive(bool $active = true) : Module {
+        $this->active = $active;
+
         return $this;
     }
 
     /**
-     * @return bool
+     * @return int
      */
-    public function getOrder()
-    {
+    public function getOrder() : int {
         return $this->order;
     }
+
+    /**
+     * @param int $order
+     *
+     * @return Module
+     */
+    public function setOrder(int $order) : Module {
+        $this->order = $order;
+
+        return $this;
+    }
+
 }

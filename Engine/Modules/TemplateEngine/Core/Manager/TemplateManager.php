@@ -3,6 +3,7 @@
 namespace Oforge\Engine\Modules\TemplateEngine\Core\Manager;
 
 use Oforge\Engine\Modules\Core\Abstracts\AbstractTemplateManager;
+use Oforge\Engine\Modules\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Modules\Core\Helper\Helper;
 use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\TemplateEngine\Core\Services\TemplateManagementService;
@@ -42,7 +43,7 @@ class TemplateManager extends AbstractTemplateManager {
          */
         $templateManagementService = Oforge()->Services()->get("template.management");
 
-        $templateFiles = Helper::getTemplateFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR);
+        $templateFiles = FileSystemHelper::getThemeBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR);
 
         $templateManagementService->register(Statics::DEFAULT_THEME);
 

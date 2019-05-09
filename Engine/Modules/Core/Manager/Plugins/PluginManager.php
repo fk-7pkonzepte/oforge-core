@@ -10,6 +10,7 @@ use Oforge\Engine\Modules\Core\Exceptions\CouldNotInstallPluginException;
 use Oforge\Engine\Modules\Core\Exceptions\InvalidClassException;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceAlreadyDefinedException;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
+use Oforge\Engine\Modules\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Modules\Core\Helper\Helper;
 use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
@@ -39,7 +40,7 @@ class PluginManager extends AbstractDatabaseAccess {
      */
     public function init()
     {
-        $pluginFiles = Helper::getBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR);
+        $pluginFiles = FileSystemHelper::getBootstrapFiles(ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR);
 
         /**
          * @var $pluginService PluginStateService

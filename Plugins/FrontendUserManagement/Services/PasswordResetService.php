@@ -4,7 +4,7 @@ namespace FrontendUserManagement\Services;
 
 use FrontendUserManagement\Models\User;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractDatabaseAccess;
-use Oforge\Engine\Modules\Core\Helper\Helper;
+use Oforge\Engine\Modules\Core\Helper\SessionHelper;
 use Slim\Router;
 
 class PasswordResetService extends AbstractDatabaseAccess {
@@ -27,7 +27,7 @@ class PasswordResetService extends AbstractDatabaseAccess {
         /** @var Router $router */
         /** @var User $user */
         $user = $this->repository()->findOneBy(['email' => $email]);
-        $guid= Helper::generateGuid();
+        $guid= SessionHelper::generateGuid();
         $user->setGuid($guid);
         $this->entityManager()->flush();
 
@@ -75,7 +75,7 @@ class PasswordResetService extends AbstractDatabaseAccess {
         $user = $this->repository()->findOneBy(['guid' => $guid]);
 
         if ($user) {
-            $user->setGuid(Helper::generateGuid());
+            $user->setGuid(SessionHelper::generateGuid());
             $user->setPassword($password);
             $this->entityManager()->flush();
 

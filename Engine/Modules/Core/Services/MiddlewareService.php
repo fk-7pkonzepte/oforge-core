@@ -4,35 +4,43 @@ namespace Oforge\Engine\Modules\Core\Services;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use InvalidArgumentException;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistsException;
 use Oforge\Engine\Modules\Core\Models\Plugin\Middleware;
+use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
 
+/**
+ * Class MiddlewareService
+ *
+ * @package Oforge\Engine\Modules\Core\Services
+ */
 class MiddlewareService extends AbstractDatabaseAccess {
+
     public function __construct() {
-        parent::__construct(['default' => Middleware::class]);
+        parent::__construct(Middleware::class);
     }
 
     /**
-     * @param $name
+     * Get all active middlewares.
      *
-     * @return array|Middleware[]
+     * @param string $name
+     *
+     * @return Middleware[]
      * @throws ORMException
      */
-    public function getActive($name)
-    {
+    public function getActive(string $name) {
+        // $middlewares = $this->repository->findBy([
+        //     'name'   => [$name, '*', $name . '*'],
+        //     'active' => true,
+        // ], [
+        //     'order' => 'DESC',
+        // ]);
         $queryBuilder = $this->entityManager()->createQueryBuilder();
-        $result = $queryBuilder->select(array('m'))
-            ->from(Middleware::class, 'm')
-            ->where($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->eq('m.name', '?1')
-            ))
-            ->andWhere($queryBuilder->expr()->eq('m.active', 1))
-            ->orderBy('m.position', 'DESC')
-            ->setParameters([1 => $name])
-            ->getQuery();
-        $middlewares = $result->execute();
+        $result       = $queryBuilder->select(['m'])->from(Middleware::class, 'm')->where($queryBuilder->expr()->orX($queryBuilder->expr()->eq('m.name', '?1')))
+                                     ->andWhere($queryBuilder->expr()->eq('m.active', 1))->orderBy('m.order', 'DESC')->setParameters([1 => $name])->getQuery();
+        $middlewares  = $result->execute();
+        // var_dump(array_map(function ($e) { return $e->getName();
+        // }, $middlewares));
 
         return $middlewares;
     }
@@ -44,57 +52,61 @@ class MiddlewareService extends AbstractDatabaseAccess {
      * @throws ORMException
      */
     public function getAllDistinctActiveNames() {
-
         $queryBuilder = $this->entityManager()->createQueryBuilder();
-        $result = $queryBuilder->select(array('m.name'))
-           ->from(Middleware::class, 'm')
-           ->where($queryBuilder->expr()->eq('m.active', 1))
-           ->andWhere($queryBuilder->expr()->neq('m.name', '?1'))
-           ->groupBy("m.name")
-           ->setParameters([1 => '*'])
-           ->getQuery();
-        $middlewares = $result->execute();
-        
+        $result       = $queryBuilder->select(['m.name'])->from(Middleware::class, 'm')->where($queryBuilder->expr()->eq('m.active', 1))
+                                     ->andWhere($queryBuilder->expr()->neq('m.name', '?1'))->groupBy("m.name")->setParameters([1 => '*'])->getQuery();
+        $middlewares  = $result->execute();
+
         $names = [];
-        
+
         foreach ($middlewares as $middleware) {
             array_push($names, $middleware['name']);
         }
-        
+
         return $names;
     }
 
     /**
-     * @param $middlewares
-     * @param bool $activate
+     * Install middlewares by bootstrap middleware config.
+     *
+     * @param array $middlewareConfigs
+     * @param Plugin|null $plugin
      *
      * @return Middleware[]
      * @throws ConfigOptionKeyNotExistsException
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function register($middlewares, $activate = false) {
-        /**
-         * @var $result Middleware[]
-         */
+    public function install(array $middlewareConfigs, ?Plugin $plugin = null) {
+        /** @var Middleware[] $result */
         $result = [];
 
-        if (is_array($middlewares) && sizeof($middlewares) > 0) {
-
-            foreach ($middlewares as $pathName => $middleware) {
-                $element = null;
-
-                if (array_key_exists("class", $middleware)) {
-                    $element = $this->createMiddleware($middleware, $pathName, $activate);
-                } elseif (is_array($middleware)) {
-                    foreach ($middleware as $key => $value) {
-                        $element = $this->createMiddleware($value, $pathName, $activate);
+        if (is_array($middlewareConfigs) && !empty($middlewareConfigs)) {
+            $flush = false;
+            foreach ($middlewareConfigs as $pathName => $middlewareConfig) {
+                if ($this->isValid($middlewareConfig)) {
+                    // Check if the element is already within the system
+                    $middleware = $this->repository()->findOneBy([
+                        'class' => $middlewareConfig['class'],
+                    ]);
+                    if (!isset($middleware)) {
+                        $middleware = Middleware::create([
+                            'name'   => $pathName,
+                            'active' => false,
+                            'class'  => $middlewareConfig['class'],
+                            'order'  => $middlewareConfig['order'],
+                        ]);
+                        if (isset($plugin)) {
+                            $middleware->setPlugin($plugin);
+                        }
+                        $this->entityManager()->persist($middleware);
+                        $flush = true;
                     }
+                    $result[] = $middleware;
                 }
-
-                if (isset($element)) {
-                    array_push($result, $element);
-                }
+            }
+            if ($flush) {
+                $this->entityManager()->flush();
             }
         }
 
@@ -102,58 +114,49 @@ class MiddlewareService extends AbstractDatabaseAccess {
     }
 
     /**
-     * @param $middleware
-     * @param $pathName
-     * @param bool $activate
+     * Deinstall middlewares by bootstrap middleware config.
      *
-     * @return object|Middleware|null
+     * @param array $middlewareConfigs
+     *
      * @throws ConfigOptionKeyNotExistsException
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    private function createMiddleware($middleware, $pathName, $activate = false) {
-        $active = $activate ? 1 : 0;
-
-        if ($this->isValid($middleware)) {
-            /**
-             * Check if the element is already within the system
-             */
-            $element = $this->repository()->findOneBy(["class" => $middleware["class"]]);
-            if(!isset($element)) {
-                $element = Middleware::create(["name" => $pathName,  "class" => $middleware["class"], "active" => $active, "position" => $middleware["position"]]);
-
-                $this->entityManager()->persist($element);
-                $this->entityManager()->flush();
-            }
-
-            return $element;
-        }
-        return null;
+    public function deinstall(array $middlewareConfigs) {
+        $this->iterateMiddlewares($middlewareConfigs, function (Middleware $middleware) {
+            $this->entityManager()->remove($middleware);
+            //TODO Plugin???
+        });
     }
 
     /**
-     * @param array $options
+     * Activate middlewares by bootstrap middleware config.
      *
-     * @return bool
+     * @param array $middlewareConfigs
+     *
      * @throws ConfigOptionKeyNotExistsException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    private function isValid(Array $options)
-    {
-        /**
-         * Check if required keys are within the options
-         */
-        $keys = ["class"];
-        foreach ($keys as $key) {
-            if (!array_key_exists($key, $options)) throw new ConfigOptionKeyNotExistsException($key);
-        }
+    public function activate(array $middlewareConfigs) {
+        $this->iterateMiddlewares($middlewareConfigs, function (Middleware $middleware) {
+            $middleware->setActive(true);
+        });
+    }
 
-        /*
-         * Check if correct type are set
-         */
-        if (isset($options["position"]) && !is_integer($options["position"])) {
-            throw new InvalidArgumentException("Position value should be of type integer. ");
-        }
-        return true;
+    /**
+     * Deactivate middlewares by bootstrap middleware config.
+     *
+     * @param array $middlewareConfigs
+     *
+     * @throws ConfigOptionKeyNotExistsException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function dectivate(array $middlewareConfigs) {
+        $this->iterateMiddlewares($middlewareConfigs, function (Middleware $middleware) {
+            $middleware->setActive(false);
+        });
     }
 
     /**
@@ -161,8 +164,9 @@ class MiddlewareService extends AbstractDatabaseAccess {
      *
      * @throws ORMException
      * @throws OptimisticLockException
+     * @deprecated
      */
-    public function activate(string $middlewareName) {
+    public function activateMiddleware(string $middlewareName) {
         $this->changeActiveState($middlewareName, true);
     }
 
@@ -171,22 +175,81 @@ class MiddlewareService extends AbstractDatabaseAccess {
      *
      * @throws ORMException
      * @throws OptimisticLockException
+     * @deprecated
      */
-    public function deactivate(string $middlewareName) {
+    public function deactivateMiddleware(string $middlewareName) {
         $this->changeActiveState($middlewareName, false);
     }
 
     /**
-     * @param $middlewareName
-     * @param $state
+     * Iterate through middlewares by bootstrap middleware config.
      *
+     * @param array $middlewareConfigs
+     *
+     * @throws ConfigOptionKeyNotExistsException
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    private function changeActiveState($middlewareName, $state) {
+    private function iterateMiddlewares(array $middlewareConfigs, callable $callable) : void {
+        if (is_array($middlewareConfigs) && !empty($middlewareConfigs)) {
+            $pathNames = [];
+            foreach ($middlewareConfigs as $pathName => $middlewareConfig) {
+                if ($this->isValid($middlewareConfig)) {
+                    $pathNames[] = $pathName;
+                }
+            }
+            if (!empty($pathNames)) {
+                /** @var Middleware[] $middlewares */
+                $middlewares   = $this->repository()->findBy([
+                    'name' => $pathNames,
+                ]);
+                $entityManager = $this->entityManager();
+                foreach ($middlewares as $middleware) {
+                    if (!$entityManager->contains($middleware)) {
+                        $entityManager->merge($middleware);
+                    }
+                    $callable($middleware);
+                }
+                $entityManager->flush();
+            }
+        }
+    }
+
+    /**
+     * @param string $middlewareName
+     * @param bool $active
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @deprecated
+     */
+    private function changeActiveState(string $middlewareName, bool $active) {
         $middleware = $this->repository()->findOneBy(['class' => $middlewareName]);
-        $middleware->setActive($state);
+        $middleware->setActive($active);
         //$this->entityManager()->persist($middleware);
         $this->entityManager()->flush($middleware);
     }
+
+    /**
+     * @param array $options
+     *
+     * @return bool
+     * @throws ConfigOptionKeyNotExistsException
+     */
+    private function isValid(array $options) {
+        // Check if required keys are within the options
+        $keys = ['class'];
+        foreach ($keys as $key) {
+            if (!isset($options[$key])) {
+                throw new ConfigOptionKeyNotExistsException($key);
+            }
+        }
+        // Check if correct type are set
+        if (isset($options['order']) && !is_integer($options['order'])) {
+            throw new \InvalidArgumentException('Order value should be of type integer.');
+        }
+
+        return true;
+    }
+
 }

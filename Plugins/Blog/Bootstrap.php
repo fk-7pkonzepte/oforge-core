@@ -27,7 +27,7 @@ class Bootstrap extends AbstractBootstrap {
         ];
         
         $this->middlewares = [
-            'home2' => ['class' => HomeMiddleware::class, 'position' => 0]
+            'home2' => ['class' => HomeMiddleware::class, 'order' => 0]
         ];
         
         $this->models = [
