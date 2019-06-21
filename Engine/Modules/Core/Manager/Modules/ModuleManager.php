@@ -104,7 +104,7 @@ class ModuleManager {
                  */
                 $instance = $bucket[$i];
 
-                $startTime = microtime(true) * 1000 ;
+                $startTime = microtime(true) * 1000;
 
                 if (sizeof($instance->getDependencies()) > 0) {
                     $found = true;
@@ -140,6 +140,19 @@ class ModuleManager {
 
         if (sizeof($bucket) > 0) {
             throw new CouldNotInstallModuleException(get_class($bucket[0]), $bucket[0]->getDependencies());
+        }
+    }
+
+    public function load() {
+        /**
+         * find all Modules order by "order"
+         * @var Module[] $modules
+         */
+        $modules = Oforge()->DB()->getForgeEntityManager()->getRepository(Module::class)->findBy(['active' => true], ['order' => 'ASC']);
+        foreach ($modules as $module) {
+            $classname = $module->getName();
+            $instance = new $classname();
+            $instance->load();
         }
     }
 
@@ -217,7 +230,6 @@ class ModuleManager {
             $instance->activate();
 
             $this->entityManger()->flush();
-            $instance->load();
         }
     }
 
@@ -279,8 +291,9 @@ class ModuleManager {
             $instance->activate();
 
             if ($needFlush) {
-            $this->entityManger()->flush();
+                $this->entityManger()->flush();
+            }
         }
     }
-}
+
 }

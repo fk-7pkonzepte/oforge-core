@@ -266,10 +266,12 @@ class BlackSmith {
         // Init and load modules
         $this->moduleManager = ModuleManager::getInstance();
         $this->moduleManager->init();
+        $this->moduleManager->load();
 
         // Init and load plugins
         $this->pluginManager = PluginManager::getInstance();
         $this->pluginManager->init();
+        $this->pluginManager->load();
 
         // Init slim route manager
         $this->slimRouteManagager = SlimRouteManager::getInstance();
@@ -277,7 +279,6 @@ class BlackSmith {
         // Let the Blacksmith forge all the things \°/
         if ($start) {
             $this->slimRouteManagager->init();
-            $this->pluginManager->load();
             $this->forgeSlimApp->run();
         }
     }
