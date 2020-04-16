@@ -1,0 +1,12 @@
+<?php
+define('ROOT_PATH', dirname(__DIR__));
+set_time_limit(0);
+
+require_once ROOT_PATH . '/vendor/autoload.php';
+
+$smith = BlackSmith::getInstance();
+$smith->forge(false);
+
+/** @var \Oforge\Engine\Modules\Console\Services\ConsoleService $consoleService */
+$consoleService = Oforge()->Services()->get('console');
+$consoleService->runCommand('', join(' ', array_slice($argv, 1)));

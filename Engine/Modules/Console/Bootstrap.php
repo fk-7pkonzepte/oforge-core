@@ -35,7 +35,6 @@ class Bootstrap extends AbstractBootstrap {
             DevCleanupBatchCommand::class,
             DevDoctrineOrmCacheCleanupCommand::class,
             CommandListCommand::class,
-            DoctrineOrmWrapperCommand::class,
             ExampleBatchCommand::class,
             ExampleGroupCommand::class,
             ExampleCommandOne::class,
