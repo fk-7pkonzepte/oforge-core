@@ -3,6 +3,7 @@
         "php": ">=7.2",
         "ext-imagick": "*",
         "ext-curl": "*",
+        "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-xml": "*",
@@ -21,8 +22,7 @@
         "ext-fileinfo": "*",
         "vimeo/vimeo-api": "^3.0",
         "google/cloud-translate": "*",
-        "wikimedia/composer-merge-plugin": "*",
-        "hybridauth/hybridauth": "^3.2"
+        "wikimedia/composer-merge-plugin": "*"
     },
     "repositories": [
         {

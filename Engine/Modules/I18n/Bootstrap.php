@@ -16,6 +16,7 @@ use Oforge\Engine\Modules\I18n\Helper\I18N;
 use Oforge\Engine\Modules\I18n\Middleware\I18nMiddleware;
 use Oforge\Engine\Modules\I18n\Models\Language;
 use Oforge\Engine\Modules\I18n\Models\Snippet;
+use Oforge\Engine\Modules\I18n\Services\ImportService;
 use Oforge\Engine\Modules\I18n\Services\InternationalizationService;
 use Oforge\Engine\Modules\I18n\Services\LanguageService;
 
@@ -39,6 +40,7 @@ class Bootstrap extends AbstractBootstrap {
 
         $this->services = [
             'i18n'          => InternationalizationService::class,
+            'i18n.import'   => ImportService::class,
             'i18n.language' => LanguageService::class,
         ];
 

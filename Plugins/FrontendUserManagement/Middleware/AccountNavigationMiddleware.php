@@ -4,8 +4,6 @@ namespace FrontendUserManagement\Middleware;
 use FrontendUserManagement\Services\AccountNavigationService;
 use Oforge\Engine\Modules\Core\Services\ConfigService;
 use Oforge\Engine\Modules\I18n\Helper\I18N;
-use Oforge\Engine\Modules\I18n\Services\InternationalizationService;
-use Oforge\Engine\Modules\I18n\Services\LanguageService;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
