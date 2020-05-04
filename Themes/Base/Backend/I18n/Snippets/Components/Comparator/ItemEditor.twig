@@ -1,0 +1,12 @@
+<div>
+    {% if snippet == null %}
+        {% set editorName = ('data_create[' ~ rowIndex ~ '][value]') %}
+        {% set editorValue = '' %}{# otherSnippet.value|default('')#}
+        <input name="data_create[{{ rowIndex }}][scope]" value="{{ language }}" type="hidden" />
+        <input name="data_create[{{ rowIndex }}][name]" value="{{ name }}" type="hidden" />
+    {% else %}
+        {% set editorName = 'data_update[' ~ snippet.id ~ '][value]' %}
+        {% set editorValue = snippet.value|default('') %}
+    {% endif %}
+    <textarea name="{{- editorName -}}" class="form-control" data-side="{{- side -}}" data-row="{{- rowIndex -}}">{{- editorValue -}}</textarea>
+</div>

@@ -1,0 +1,22 @@
+[
+    {
+        "key": "test_key1",
+        "iso": "en",
+        "value": "test_key1-en"
+    },
+    {
+        "key": "test_key1",
+        "iso": "de",
+        "value": "test_key1-de"
+    },
+    {
+        "key": "test_key2",
+        "iso": "en",
+        "value": "test_key2-en"
+    },
+    {
+        "key": "test_key2",
+        "iso": "de",
+        "value": "test_key2-de"
+    }
+]

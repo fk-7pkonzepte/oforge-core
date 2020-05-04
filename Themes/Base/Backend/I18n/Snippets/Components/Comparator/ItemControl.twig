@@ -1,0 +1,28 @@
+{% set titles = {
+    create: i18n('module_i18n_snippet_comparator_item_control_create', {
+        en: 'Create snippet?',
+        de: 'Snippet anlegen?',
+    }),
+    update: i18n('module_i18n_snippet_comparator_item_control_update', {
+        en: 'Update snippet?',
+        de: 'Snippet zu aktualisieren?',
+    }),
+} %}
+{% if snippet == null %}{# create #}
+    {% set icon = 'fa-plus-circle' %}
+{% elseif snippet.value is empty %}{# update, empty #}
+    {% set icon = 'fa-exclamation-circle' %}
+{% else %}{# update #}
+    {% set icon = 'fa-pencil' %}
+{% endif %}
+<label class="i18n-snippet-comparator-change" data-side="{{ side }}" data-row="{{- rowIndex -}}" title="{{ snippet == null ? titles.create : titles.update }}">
+    {% if snippet == null %}
+        <input name="data_create[{{ rowIndex }}][active]" value="0" type="hidden" />
+        <input name="data_create[{{ rowIndex }}][active]" value="1" type="checkbox" checked />
+    {% else %}
+        <input name="data_update[{{ snippet.id }}][active]" value="0" type="hidden" />
+        <input name="data_update[{{ snippet.id }}][active]" value="1" type="checkbox" />
+    {% endif %}
+    <i class="fa {{ icon }} i18n-snippet-comparator-change--inactive"></i>
+    <i class="fa {{ icon }} i18n-snippet-comparator-change--active"></i>
+</label>

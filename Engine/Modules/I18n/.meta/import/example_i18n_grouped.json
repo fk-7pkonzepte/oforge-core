@@ -1,0 +1,16 @@
+[
+    {
+        "key": "test_key1",
+        "values": {
+            "en": "test_key1-en",
+            "de": "test_key1-de"
+        }
+    },
+    {
+        "key": "test_key2",
+        "values": {
+            "en": "test_key2-en",
+            "de": "test_key2-de"
+        }
+    }
+]

@@ -5,7 +5,6 @@ namespace Oforge\Engine\Modules\I18n\Services;
 use Exception;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Modules\Core\Helper\CsvHelper;
-use Oforge\Engine\Modules\Core\Helper\StringHelper;
 use Oforge\Engine\Modules\I18n\Models\Language;
 use Oforge\Engine\Modules\I18n\Models\Snippet;
 
@@ -15,28 +14,15 @@ use Oforge\Engine\Modules\I18n\Models\Snippet;
  * @package Oforge\Engine\Modules\I18n\Services
  */
 class ImportService extends AbstractDatabaseAccess {
+
+    /**
+     * ImportService constructor.
+     */
     public function __construct() {
         parent::__construct([
             'language' => Language::class,
             'snippet'  => Snippet::class,
         ]);
-    }
-
-    /**
-     * @param string $filepath Path to file, should be an absolute path if possible.
-     * @param bool $groupedByKey Are snippet values grouped by key?
-     *
-     * @return array Returns empty Array if not supported file format or statistics array with items (number of processed items), skipped (skipped items with errors), created & updated & unchanched (created or updated or not changed snippets).
-     * @throws Exception
-     */
-    public function import(string $filepath, bool $groupedByKey) : array {
-        if (StringHelper::endsWith($filepath - strtolower($filepath), '.csv')) {
-            return $this->importCSVInternal($filepath, $groupedByKey);
-        } elseif (StringHelper::endsWith($filepath - strtolower($filepath), '.json')) {
-            return $this->importJsonInternal($filepath, $groupedByKey);
-        }
-
-        return [];
     }
 
     /**
@@ -47,12 +33,13 @@ class ImportService extends AbstractDatabaseAccess {
      * ( i.e. 'php /bin/console oforge:service:run i18n:importFromCsv mysnippets.csv' ).
      *
      * @param string $filepath Path to file, should be an absolute path if possible.
+     * @param bool $withHeaderRow With Header Row?
      *
      * @return array Statistics array with items (number of processed items), skipped (skipped items with errors), created & updated & unchanched (created or updated or not changed snippets)
      * @throws Exception
      */
-    public function importCSV(string $filepath) : array {
-        return $this->importCSVInternal($filepath, false);
+    public function importListCSV(string $filepath, bool $withHeaderRow = true) : array {
+        return $this->importCSVInternal($filepath, false, $withHeaderRow);
     }
 
     /**
@@ -72,7 +59,7 @@ class ImportService extends AbstractDatabaseAccess {
      * @throws Exception
      */
     public function importGroupedCSV(string $filepath) : array {
-        return $this->importCSVInternal($filepath, true);
+        return $this->importCSVInternal($filepath, true, false);
     }
 
     /**
@@ -81,7 +68,7 @@ class ImportService extends AbstractDatabaseAccess {
      * @return array Statistics array with items (number of processed items), skipped (skipped items with errors), created & updated & unchanched (created or updated or not changed snippets)
      * @throws Exception
      */
-    public function importJson(string $filepath) : array {
+    public function importListJson(string $filepath) : array {
         return $this->importJsonInternal($filepath, false);
     }
 
@@ -98,13 +85,14 @@ class ImportService extends AbstractDatabaseAccess {
     /**
      * @param string $filepath
      * @param bool $groupedByKey Are snippet values grouped by key?
+     * @param bool $skipFirstRow
      *
      * @return array
      * @throws Exception
      */
-    protected function importCSVInternal(string $filepath, bool $groupedByKey) {
+    protected function importCSVInternal(string $filepath, bool $groupedByKey, bool $skipFirstRow) : array {
         $options      = [
-            'header-row' => false,
+            'header-row' => $skipFirstRow,
         ];
         $statistics   = [
             'items'     => 0,
@@ -113,10 +101,10 @@ class ImportService extends AbstractDatabaseAccess {
             'updated'   => 0,
             'unchanged' => 0,
         ];
-        $firstRow     = true;
         $languageIsos = [];
 
         if ($groupedByKey) {
+            $firstRow    = true;
             $rowCallable = function ($row) use ($filepath, &$statistics, &$firstRow, &$languageIsos) {
                 if (!is_array($row) || empty($row)) {
                     // $statistics['skipped']++;
@@ -143,8 +131,8 @@ class ImportService extends AbstractDatabaseAccess {
                 $this->importSnippets($filepath, $statistics, $key, $values);
             };
         } else {
-            $rowCallable = function ($row) use ($filepath, &$statistics, &$firstRow, &$languageIsos) {
-                if (!is_array($row) || empty($row) || $firstRow) {
+            $rowCallable = function ($row) use ($filepath, &$statistics, &$languageIsos) {
+                if (!is_array($row) || empty($row)) {
                     // $statistics['skipped']++;
                     return;
                 }
@@ -218,8 +206,7 @@ class ImportService extends AbstractDatabaseAccess {
                 $values = $item['values'];
             } else {
                 $values = [
-                    'iso'   => $item['iso'],
-                    'value' => $item['value'],
+                    $item['iso'] => $item['value'],
                 ];
             }
             $this->importSnippets($filepath, $statistics, $item['key'], $values);

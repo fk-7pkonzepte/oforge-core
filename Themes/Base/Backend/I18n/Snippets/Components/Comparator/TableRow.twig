@@ -1,37 +1,59 @@
-{% set useTextarea = item.scopes[meta.route.query.language1].value|default('')|length > 99
-    or item.scopes[meta.route.query.language2].value|default('')|length > 99 %}
-<tr>
-    <td>{{ item.name }}</td>
-    <td>
-        {% include 'Backend/I18n/Snippets/Components/Comparator/Editor.twig' with {
-            side: 'language1',
-            useTextarea: useTextarea,
-            rowIndex: rowIndex,
-            item: item,
-            meta: meta,
-        } only %}
-    </td>
-    <td>
-        <div class="btn-group">
-            <button class="btn btn-default module-i18n-snippet-comparator-language-copy" type="button" tabindex="-1"
-                    title="{{ i18n('backend_i18n_snippet_comparator_copy_left', {en: 'copy right to left', de: 'kopiere von rechts nach links'}) }}"
-                    data-src="language2-{{ rowIndex }}" data-dst="language1-{{ rowIndex }}">
-                <i class="fa fa-caret-left"></i>
-            </button>
-            <button class="btn btn-default module-i18n-snippet-comparator-language-copy" type="button" tabindex="-1"
-                    title="{{ i18n('backend_i18n_snippet_comparator_copy_right', {en: 'copy left to right', de: 'kopiere von links nach rechts'}) }}"
-                    data-src="language1-{{ rowIndex }}" data-dst="language2-{{ rowIndex }}">
-                <i class="fa fa-caret-right"></i>
-            </button>
-        </div>
-    </td>
-    <td>
-        {% include 'Backend/I18n/Snippets/Components/Comparator/Editor.twig' with {
-            side: 'language2',
-            useTextarea: useTextarea,
-            rowIndex: rowIndex,
-            item: item,
-            meta: meta,
-        } only %}
-    </td>
-</tr>
+{% set snippet1 = item.scopes[language1]|default(null) %}
+{% set snippet2 = item.scopes[language2]|default(null) %}
+{% set includeRow = true %}
+{% if filter != 'all' %}
+    {% if filter == 'missing' %}
+        {% set includeRow = (snippet1 == null) or (snippet2 == null) %}
+    {% elseif filter == 'equals_name' %}
+        {% set includeRow = false %}
+        {% set tmpName = item.name %}
+        {% for scope in item.scopes %}
+            {% if tmpName == scope.value %}
+                {% set includeRow = true %}
+            {% endif %}
+            {% set tmpName = scope.value %}
+        {% endfor %}
+    {% endif %}
+{% endif %}
+{% if includeRow %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td>
+            {% include 'Backend/I18n/Snippets/Components/Comparator/ItemEditor.twig' with {
+                rowIndex: rowIndex,
+                side: 'language1',
+                snippet: snippet1,
+                otherSnippet: snippet2,
+                language: language1,
+                name: item.name,
+            } only %}
+        </td>
+        <td class="cell-center">
+            {% include 'Backend/I18n/Snippets/Components/Comparator/ItemControl.twig' with {
+                rowIndex: rowIndex,
+                snippet: snippet1,
+                side: 'language1'
+            } only %}
+        </td>
+        <td class="cell-center group-actions">
+            {% include 'Backend/I18n/Snippets/Components/Comparator/TableRowActions.twig' %}
+        </td>
+        <td class="cell-center">
+            {% include 'Backend/I18n/Snippets/Components/Comparator/ItemControl.twig' with {
+                rowIndex: rowIndex,
+                snippet: snippet2,
+                side: 'language2'
+            } only %}
+        </td>
+        <td>
+            {% include 'Backend/I18n/Snippets/Components/Comparator/ItemEditor.twig' with {
+                rowIndex: rowIndex,
+                side: 'language2',
+                snippet: snippet2,
+                otherSnippet: snippet1,
+                language: language2,
+                name: item.name,
+            } only %}
+        </td>
+    </tr>
+{% endif %}

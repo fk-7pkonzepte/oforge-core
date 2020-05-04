@@ -5,6 +5,7 @@
                    class="table table-bordered table-hover table-striped i18n-snippet-comparator-table">
                 <thead>
                 {% include 'Backend/I18n/Snippets/Components/Comparator/TableHeader.twig' with {
+                    languages: comparator.languages,
                     meta: meta,
                 } only %}
                 </thead>
@@ -12,7 +13,9 @@
                 {% for i18nComparatorItem in comparator.items %}
                     {% include 'Backend/I18n/Snippets/Components/Comparator/TableRow.twig' with {
                         item: i18nComparatorItem,
-                        meta: meta,
+                        language1: meta.route.query.language1,
+                        language2: meta.route.query.language2,
+                        filter: meta.route.query.filter|default(null),
                         rowIndex: loop.index0,
                     } only %}
                 {% else %}
@@ -25,6 +28,7 @@
                 </tbody>
                 <tfoot>
                 {% include 'Backend/I18n/Snippets/Components/Comparator/TableHeader.twig' with {
+                    languages: comparator.languages,
                     meta: meta,
                 } only %}
                 </tfoot>

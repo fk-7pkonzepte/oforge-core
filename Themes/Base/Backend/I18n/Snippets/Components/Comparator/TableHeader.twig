@@ -1,10 +1,22 @@
 <th>
-    {{ i18n('module_i18n_snippet_name', {en: 'Name', de: 'Name'}) }}
+    {{ i18n('module_i18n_snippet_comparator_name', {en: 'Name', de: 'Name'}) }}
 </th>
 <th class="text-center">
-    <span class="label label-primary">{{ meta.route.query.language1 }}</span>
+    <span class="label label-primary">{{ meta.route.query.language1 }} - {{ languages[meta.route.query.language1] }}</span>
 </th>
-<th width="8rem"></th>
+<th>
+    <button class="i18n-snippet-comparator-toggle btn btn-default btn-sm" data-side="language1" title="{{ i18n('module_i18n_snippet_comparator_toggle_column', {
+        en: 'Toggle all in this column',
+        de: 'Schalten Sie alle in dieser Spalte um',
+    }) }}" type="button"><i class="fa fa-toggle-off"></i></button>
+</th>
+<th></th>
+<th>
+    <button class="i18n-snippet-comparator-toggle btn btn-default btn-sm" data-side="language2" title="{{ i18n('module_i18n_snippet_comparator_toggle_column', {
+        en: 'Toggle all in this column',
+        de: 'Schalten Sie alle in dieser Spalte um',
+    }) }}" type="button"><i class="fa fa-toggle-off"></i></button>
+</th>
 <th class="text-center">
-    <span class="label label-primary">{{ meta.route.query.language2 }}</span>
+    <span class="label label-primary">{{ meta.route.query.language2 }} - {{ languages[meta.route.query.language2] }}</span>
 </th>

@@ -2,14 +2,8 @@
 
 namespace Oforge\Engine\Modules\I18n;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Oforge\Engine\Modules\AdminBackend\Core\Services\BackendNavigationService;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigElementAlreadyExistException;
-use Oforge\Engine\Modules\Core\Exceptions\ConfigOptionKeyNotExistException;
-use Oforge\Engine\Modules\Core\Exceptions\ParentNotFoundException;
-use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Modules\I18n\Controller\Backend\I18n\LanguageController;
 use Oforge\Engine\Modules\I18n\Controller\Backend\I18n\SnippetsController;
 use Oforge\Engine\Modules\I18n\Helper\I18N;
@@ -47,15 +41,16 @@ class Bootstrap extends AbstractBootstrap {
         $this->order = 4;
     }
 
-    /**
-     * @throws ConfigElementAlreadyExistException
-     * @throws ConfigOptionKeyNotExistException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws ParentNotFoundException
-     * @throws ServiceNotFoundException
-     */
+    /** @inheritDoc */
     public function install() {
+        parent::install();
+        /** @var ImportService $importService */
+        $importService = Oforge()->Services()->get('i18n.import');
+        // $importService->importGroupedCSV(__DIR__ . '/.meta/import/example_i18n_grouped.csv');
+        // $importService->importGroupedJson(__DIR__ . '/.meta/import/example_i18n_grouped.json');
+        // $importService->importCSV(__DIR__ . '/.meta/import/example_i18n_list.csv', false);
+        // $importService->importJson(__DIR__ . '/.meta/import/example_i18n_list.json');
+        //TODO create snippet import file & import here
         /** @var LanguageService $languageService */
         $languageService = Oforge()->Services()->get('i18n.language');
         $languageService->create([
@@ -124,7 +119,9 @@ class Bootstrap extends AbstractBootstrap {
         ]);
     }
 
-    public function activate() {
+    /** @inheritDoc */
+    public function load() {
+        parent::load();
         if (Oforge()->isAppReady()) {
             Oforge()->App()->add(new I18nMiddleware());
         }

@@ -156,6 +156,10 @@ class SnippetsController extends BaseCrudController {
             $failed  = 0;
             if (isset($postData['data_create'])) {
                 foreach ($postData['data_create'] as $data) {
+                    if ((bool) $data['active'] === false) {
+                        continue;
+                    }
+                    unset($data['active']);
                     $data = $this->convertData($data, 'update');
                     try {
                         $this->crudService->create($this->model, $data);
@@ -172,6 +176,10 @@ class SnippetsController extends BaseCrudController {
                 }
             }
             foreach ($postData['data_update'] as $entityID => $data) {
+                if ((bool) $data['active'] === false) {
+                    continue;
+                }
+                unset($data['active']);
                 $data['id'] = $entityID;
                 $data       = $this->convertData($data, 'update');
                 try {
@@ -284,6 +292,32 @@ class SnippetsController extends BaseCrudController {
                     ],
                 ],
                 'compare' => CrudFilterComparator::LIKE,
+            ],
+            'filter'    => [
+                'type'    => CrudFilterType::SELECT,
+                'label'   => [
+                    'key'     => 'module_i18n_filter_comparator_all',
+                    'default' => [
+                        'en' => 'All',
+                        'de' => 'Alle',
+                    ],
+                ],
+                'default' => 'all',
+                'compare' => CrudFilterComparator::EQUALS,
+                'list'    => [
+                    'all'         => I18N::translate('module_i18n_filter_comparator_all', [
+                        'en' => 'All',
+                        'de' => 'Alle',
+                    ]),
+                    'equals_name' => I18N::translate('module_i18n_filter_snippet_equals_name', [
+                        'en' => 'If name = value',
+                        'de' => 'Wenn Name = Wert',
+                    ]),
+                    'missing'     => I18N::translate('module_i18n_filter_comparator_missing', [
+                        'en' => 'Only missing',
+                        'de' => 'Nur Fehlende',
+                    ]),
+                ],
             ],
         ];
 
