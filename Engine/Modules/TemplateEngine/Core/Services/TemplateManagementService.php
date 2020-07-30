@@ -108,13 +108,15 @@ class TemplateManagementService extends AbstractDatabaseAccess {
     /**
      * Get the active theme, delete old cached assets, build new assets
      *
+     * @param string $scope
+     *
+     * @throws InvalidScssVariableException
      * @throws ORMException
      * @throws OptimisticLockException
      * @throws ServiceNotFoundException
-     * @throws InvalidScssVariableException
      * @throws TemplateNotFoundException
      */
-    public function build() {
+    public function build(string $scope = TemplateAssetService::DEFAULT_SCOPE) {
         /** @var Template $template */
         $template = $this->getActiveTemplate();
         if ($template) {
@@ -130,7 +132,7 @@ class TemplateManagementService extends AbstractDatabaseAccess {
                 $instance->registerTemplateVariables();
             }
 
-            $templateAssetService->build($template->getName(), $templateAssetService::DEFAULT_SCOPE);
+            $templateAssetService->build($template->getName(), $scope);
         }
     }
 

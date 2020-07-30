@@ -12,6 +12,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Modules\Core\Exceptions\Template\TemplateNotFoundException;
+use Oforge\Engine\Modules\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Modules\Core\Helper\Statics;
 use Oforge\Engine\Modules\Core\Helper\StringHelper;
 use Oforge\Engine\Modules\Core\Models\Plugin\Plugin;
@@ -48,8 +49,9 @@ class BaseAssetService {
      */
     public function build(string $context, string $scope = TemplateAssetService::DEFAULT_SCOPE) : string {
         // check if the /var/public folder exists. if not, create it.
-        if (!file_exists(ROOT_PATH . Statics::ASSET_CACHE_DIR)) {
-            mkdir(ROOT_PATH . Statics::ASSET_CACHE_DIR, 0750, true);
+        $folder = ROOT_PATH . Statics::ASSET_CACHE_DIR . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . $this->key;
+        if (!file_exists($folder)) {
+            FileSystemHelper::mkdir($folder, true, 0750);
         }
 
         return '';
@@ -63,6 +65,7 @@ class BaseAssetService {
      */
     public function clear(string $scope = TemplateAssetService::DEFAULT_SCOPE) {
         $this->storage->set($this->getAccessKey($scope), '');
+        //TODO remove file?
     }
 
     /**
@@ -72,11 +75,11 @@ class BaseAssetService {
      */
     public function getUrl(string $scope = TemplateAssetService::DEFAULT_SCOPE) : string {
         $value = $this->storage->get($this->getAccessKey($scope));
-        if (isset($value)) {
-            return $value;
+        if (empty($value)) {
+            return $this->build($scope);
         }
 
-        return $this->build($scope);
+        return $value;
     }
 
     /**
@@ -84,10 +87,10 @@ class BaseAssetService {
      *
      * @return bool
      */
-    public function isBuild(string $scope = TemplateAssetService::DEFAULT_SCOPE) {
+    public function isBuild(string $scope = TemplateAssetService::DEFAULT_SCOPE) : bool {
         $value = $this->storage->get($this->getAccessKey($scope));
 
-        return isset($value);
+        return !empty($value);
     }
 
     /**
@@ -96,7 +99,7 @@ class BaseAssetService {
      * @return string
      */
     protected function getAccessKey(string $scope = TemplateAssetService::DEFAULT_SCOPE) : string {
-        return 'compiled.' . $this->key . '.url.' . $scope;
+        return $scope . '.asset.' . $this->key . '.url';
     }
 
     /**
@@ -123,14 +126,14 @@ class BaseAssetService {
             $viewsDir = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin['name'] . DIRECTORY_SEPARATOR . Statics::VIEW_DIR;
 
             if (file_exists($viewsDir)) {
-                array_push($paths, $viewsDir);
+                $paths[] = $viewsDir;
             }
         }
 
         $templatePath = ROOT_PATH . DIRECTORY_SEPARATOR . Statics::TEMPLATE_DIR . DIRECTORY_SEPARATOR . $activeTemplate->getName();
 
         if (!in_array($templatePath, $paths)) {
-            array_push($paths, $templatePath);
+            $paths[] = $templatePath;
         }
 
         return $paths;
@@ -142,7 +145,9 @@ class BaseAssetService {
      * - find all files based on file extension except the currently used file
      * - delete
      *
+     * @param string $folder Search asset folder
      * @param string $newFileName the currently used file
+     * @param string $extension File extension
      */
     protected function removeOldAssets(string $folder, string $newFileName, string $extension) {
         $files = scandir($folder);
@@ -152,4 +157,5 @@ class BaseAssetService {
             }
         }
     }
+
 }

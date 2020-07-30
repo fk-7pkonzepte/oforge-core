@@ -27,6 +27,7 @@ class CssAssetService extends BaseAssetService {
      * 1. Base Theme
      * 2. Plugins
      * 3. Active Theme (unless it's the Base Theme)
+     *
      * @param string $context
      * @param string $scope
      *
@@ -42,15 +43,11 @@ class CssAssetService extends BaseAssetService {
 
         $dirs = $this->getAssetsDirectories();
 
-        $fileName = "style." . bin2hex(openssl_random_pseudo_bytes(16));
+        $fileName   = 'style.' . bin2hex(openssl_random_pseudo_bytes(16));
         $folder     = Statics::ASSET_CACHE_DIR . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . $this->key;
         $fullFolder = ROOT_PATH . $folder;
         $output     = $folder . DIRECTORY_SEPARATOR . $fileName;
         $outputFull = ROOT_PATH . $output;
-
-        if (!file_exists($fullFolder) || (file_exists($fullFolder) && !is_dir($fullFolder))) {
-            mkdir($fullFolder, 0750, true);
-        }
 
         // get scss variables and add to compiler
         $scss          = new Compiler();
@@ -64,19 +61,18 @@ class CssAssetService extends BaseAssetService {
         }
         $scss->setVariables($scssVariables);
 
-
         // check if source mapping is active
         /** @var  $configService */
         $configService = Oforge()->Services()->get('config');
-        $sourceMap = $configService->get('css_source_map');
+        $sourceMap     = $configService->get('css_source_map');
 
-        if($sourceMap) {
+        if ($sourceMap) {
             // source map setup
             $scss->setSourceMap(Compiler::SOURCE_MAP_INLINE);
-            $scss->setSourceMapOptions(array(
+            $scss->setSourceMapOptions([
                 'sourceMapBasepath' => ROOT_PATH,
                 'sourceRoot'        => '/',
-            ));
+            ]);
         }
 
         // iterate over all plugins, current theme and base theme
@@ -104,14 +100,16 @@ class CssAssetService extends BaseAssetService {
 
         $output = str_replace('\\', '/', $output);
         // only minify if source mapping is not active
-        if(!$sourceMap) {
+        if (!$sourceMap) {
             $minifier = new CSS($outputFull . ".css");
             $minifier->minify($outputFull . ".min.css");
             $this->storage->set($this->getAccessKey($scope), $output . ".min.css");
+
             return $output . ".min.css";
         }
 
         $this->storage->set($this->getAccessKey($scope), $output . ".css");
+
         return $output . ".css";
     }
 }

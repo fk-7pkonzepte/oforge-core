@@ -42,16 +42,12 @@ class JsAssetService extends BaseAssetService {
         $dirs             = $this->getAssetsDirectories();
         $hasFilesToMinify = false;
 
-        $fileName = "scripts." . bin2hex(openssl_random_pseudo_bytes(16));
+        $fileName = 'script.' . bin2hex(openssl_random_pseudo_bytes(16));
 
         $folder     = Statics::ASSET_CACHE_DIR . DIRECTORY_SEPARATOR . $scope . DIRECTORY_SEPARATOR . $this->key;
         $fullFolder = ROOT_PATH . $folder;
         $output     = $folder . DIRECTORY_SEPARATOR . $fileName;
         $outputFull = ROOT_PATH . $output;
-
-        if (!file_exists($fullFolder) || (file_exists($fullFolder) && !is_dir($fullFolder))) {
-            mkdir($fullFolder, 0750, true);
-        }
 
         //iterate over all plugins, current theme and base theme
         foreach ($dirs as $dir) {
