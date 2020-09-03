@@ -166,6 +166,31 @@ class BackendInsertionController extends BaseCrudController {
                 'delete' => 'readonly',
             ],
         ],# views
+        [
+            'name'  => 'spam',
+            'type'  => CrudDataTypes::BOOL,
+            'lable' => ['key' => 'plugin_insertion_spam', 'default' => 'Spam'],
+            'crud' => [
+                'index'  => 'editable',
+                'view'   => 'editable',
+                'create' => 'off',
+                'update' => 'editable',
+                'delete' => 'readonly'
+            ]
+        ], # spam
+        [
+            'name'  => 'deactivationCause',
+            'type'  => CrudDataTypes::STRING,
+            'lable' => ['key' => 'plugin_insertion_deactivationCause', 'default' => 'Deaktivierungs-Grund'],
+            'crud'  => [
+                'index'  => 'editable',
+                'view'   => 'editable',
+                'create' => 'off',
+                'update' => 'editable',
+                'delete' => 'readonly',
+            ]
+        ], #deactivationCause
+
     ];
     /** @var array $indexFilter */
     protected $indexFilter = [
@@ -301,7 +326,7 @@ class BackendInsertionController extends BaseCrudController {
             $sessionKey = SessionHelper::generateGuid();
             $formsService->setProcessedData($sessionKey, $result['data']);
 
-            $data = $formsService->processPostData($sessionKey, sizeof($insertion->getMedia()) > 0);
+            $data = $formsService->processPostData($sessionKey, !empty($insertion->getMedia()));
             $data = $formsService->parsePageData($data);
 
             $updateService->update($insertion, $data);
@@ -315,6 +340,7 @@ class BackendInsertionController extends BaseCrudController {
 
         $result['insertion'] = $insertion->toArray(1);
         $result['typeId']    = $insertion->getInsertionType()->getId();
+        $result['type']      = $insertion->getInsertionType()->toArray(1);
         $result['userId']    = $insertion->getUser()->getId();
 
         Oforge()->View()->assign($result);

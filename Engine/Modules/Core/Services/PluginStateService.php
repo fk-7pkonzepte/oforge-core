@@ -90,7 +90,7 @@ class PluginStateService extends AbstractDatabaseAccess {
         if (!isset($plugin)) {
             $instance = Helper::getBootstrapInstance($pluginName);
             if (isset($instance)) {
-                $plugin            = Plugin::create([
+                $plugin = Plugin::create([
                     'name'      => $pluginName,
                     'active'    => false,
                     'installed' => false,
@@ -168,14 +168,15 @@ class PluginStateService extends AbstractDatabaseAccess {
 
     /**
      * @param string $pluginName
+     * @param bool $keepData
      *
-     * @throws PluginNotFoundException
-     * @throws PluginNotInstalledException
-     * @throws PluginNotActivatedException
      * @throws CouldNotDeactivatePluginException
      * @throws InvalidClassException
      * @throws ORMException
      * @throws OptimisticLockException
+     * @throws PluginNotActivatedException
+     * @throws PluginNotFoundException
+     * @throws PluginNotInstalledException
      * @throws ServiceNotFoundException
      */
     public function uninstall(string $pluginName, bool $keepData) {
@@ -205,7 +206,7 @@ class PluginStateService extends AbstractDatabaseAccess {
         $middlewaresService->uninstall($instance->getMiddlewares());
 
         if (isset($instance)) {
-            $instance->uninstall();
+            $instance->uninstall($keepData);
         }
 
         $plugin->setInstalled(false);
@@ -340,6 +341,34 @@ class PluginStateService extends AbstractDatabaseAccess {
 
             $pluginToDeactivate->setActive(false);
             $this->entityManager()->update($pluginToDeactivate);
+        }
+    }
+
+    /**
+     * Call Method on Plugin Bootstrap file.
+     *
+     * @param string $action One of: install|activate
+     * @param string $pluginName
+     *
+     * @throws InvalidClassException
+     */
+    public function callPluginBootstrapMethod(string $action, string $pluginName) {
+        $actions = ['install'/*, 'uninstall'*/, 'activate'];
+        if (in_array($action, $actions)) {
+            /** @var Plugin $plugin */
+            $plugin = $this->repository()->findOneBy(['name' => $pluginName]);
+            if ($plugin->getInstalled() && $plugin->getActive()) {
+                $instance = Helper::getBootstrapInstance($pluginName);
+                if ($instance === null) {
+                    echo "Plugin Bootstrap not found.\n";
+                } else {
+                    $instance->$action();
+                }
+            } else {
+                echo "Actions could only be called on installed & active plugins.\n";
+            }
+        } else {
+            echo "Unsupported action '$action'. Must be of: ", implode(', ', $actions), "\n";
         }
     }
 

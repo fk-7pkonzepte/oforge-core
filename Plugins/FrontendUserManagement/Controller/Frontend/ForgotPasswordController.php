@@ -14,6 +14,7 @@ use FrontendUserManagement\Models\User;
 use FrontendUserManagement\Services\PasswordResetService;
 use FrontendUserManagement\Services\RegistrationService;
 use Interop\Container\Exception\ContainerException;
+use Oforge\Engine\Modules\Auth\Enums\InvalidPasswordFormatException;
 use Oforge\Engine\Modules\Auth\Services\AuthService;
 use Oforge\Engine\Modules\Auth\Services\PasswordService;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractController;
@@ -21,6 +22,7 @@ use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointClass;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Modules\Core\Services\Session\SessionManagementService;
+use Oforge\Engine\Modules\Core\Services\TokenService;
 use Oforge\Engine\Modules\I18n\Helper\I18N;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -81,7 +83,9 @@ class ForgotPasswordController extends AbstractController {
         /**
          * invalid token was sent
          */
-        if (!hash_equals($_SESSION['token'], $body['token'])) {
+        /** @var TokenService $tokenService */
+        $tokenService = Oforge()->Services()->get('token');
+        if (!$tokenService->isValid($body['token'])) {
             Oforge()->View()->Flash()->addMessage('warning', I18N::translate('form_invalid_token', [
                 'en' => 'The data has been sent from an invalid form.',
                 'de' => 'Die Daten wurden von einem ungültigen Formular gesendet.',
@@ -104,7 +108,8 @@ class ForgotPasswordController extends AbstractController {
          * Email not found
          */
         if (!$passwordResetService->emailExists($email)) {
-            Oforge()->View()->Flash()->addMessage('warning', I18N::translate('user_mail_missing', 'Email not found.'));
+            Oforge()->View()->Flash()->addMessage('warning', I18N::translate('form_invalid_data', 'Invalid form data.'));
+            // Oforge()->View()->Flash()->addMessage('warning', I18N::translate('user_mail_missing', 'Email not found.'));
 
             return $response->withRedirect($uri, 302);
         }
@@ -117,8 +122,8 @@ class ForgotPasswordController extends AbstractController {
         /** @var User $user */
         $user = $registrationService->getUser($email);
 
-        $userDetail          = $user->getDetail();
-        $userNickName        = $userDetail->getNickName();
+        $userDetail   = $user->getDetail();
+        $userNickName = $userDetail->getNickName();
 
         $mailService = Oforge()->Services()->get('mail');
 
@@ -137,7 +142,7 @@ class ForgotPasswordController extends AbstractController {
         /**
          * Mail could not be sent
          */
-        if(!$mailService->send($mailOptions, $templateData)) {
+        if (!$mailService->send($mailOptions, $templateData)) {
             Oforge()->View()->Flash()->addMessage('error', I18N::translate('password_reset_mail_error', 'The mail to reset your password could not be sent'));
             Oforge()->View()->Flash()->addMessage('error', I18N::translate('password_reset_mail_error', [
                 'en' => 'The mail to reset your password could not be sent.',
@@ -240,7 +245,9 @@ class ForgotPasswordController extends AbstractController {
         /**
          * invalid token was sent
          */
-        if (!hash_equals($_SESSION['token'], $body['token'])) {
+        /** @var TokenService $tokenService */
+        $tokenService = Oforge()->Services()->get('token');
+        if (!$tokenService->isValid($token)) {
             Oforge()->View()->Flash()->addMessage('warning', I18N::translate('form_invalid_token', [
                 'en' => 'The data has been sent from an invalid form.',
                 'de' => 'Die Daten wurden von einem ungültigen Formular gesendet.',
@@ -258,9 +265,14 @@ class ForgotPasswordController extends AbstractController {
 
             return $response->withRedirect($uri, 302);
         }
+        try {
+            $password = $passwordService->validateFormat($password)->hash($password);
+        } catch (InvalidPasswordFormatException $exception) {
+            Oforge()->View()->Flash()->addMessage('error', $exception->getMessage());
 
-        $password = $passwordService->hash($password);
-        $user     = $passwordResetService->changePassword($guid, $password);
+            return $response->withRedirect($uri, 302);
+        }
+        $user = $passwordResetService->changePassword($guid, $password);
 
         /*
          * User not found
@@ -286,8 +298,6 @@ class ForgotPasswordController extends AbstractController {
         $_SESSION['auth'] = $jwt;
 
         $uri = $router->pathFor('frontend_account_dashboard');
-        Oforge()->View()->Flash()->addMessage('success',
-            I18N::translate('password_changed_successfully', 'You have successfully changed your password. You are now logged in.'));
         Oforge()->View()->Flash()->addMessage('success', I18N::translate('password_changed_successfully', [
             'en' => 'You have successfully changed your password. You are now logged in.',
             'de' => 'Dein Password wurde erfolgreich geändert. Du bist nun eingeloggt.',

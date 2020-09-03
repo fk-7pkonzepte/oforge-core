@@ -1,0 +1,8 @@
+{% block oforge_frontend_popup_backend %}
+    <div class="oforge_frontend_popup_backend">
+        <ul class="oforge_frontend_popup_backend_links">
+            <li><a href="{{ url('backend') }}">{{ i18n('goto_backend', {en: 'Backend', de: 'Backend'}) }}</a></li>
+            {% block oforge_frontend_popup_backend_links %}{% endblock oforge_frontend_popup_backend_links %}
+        </ul>
+    </div>
+{% endblock oforge_frontend_popup_backend %}

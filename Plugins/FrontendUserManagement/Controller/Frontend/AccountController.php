@@ -9,12 +9,14 @@ use FrontendUserManagement\Models\User;
 use FrontendUserManagement\Services\AccountNavigationService;
 use FrontendUserManagement\Services\PasswordResetService;
 use Insertion\Services\InsertionProfileProgressService;
+use Oforge\Engine\Modules\Auth\Enums\InvalidPasswordFormatException;
 use Oforge\Engine\Modules\Auth\Services\AuthService;
 use Oforge\Engine\Modules\Auth\Services\PasswordService;
 use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Modules\Core\Annotation\Endpoint\EndpointClass;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Modules\Core\Services\Session\SessionManagementService;
+use Oforge\Engine\Modules\Core\Services\TokenService;
 use Oforge\Engine\Modules\I18n\Helper\I18N;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -66,7 +68,7 @@ class AccountController extends SecureFrontendController {
 
         Oforge()->View()->assign(['content' => $backendNavigationService]);
 
-        if(Oforge()->View()->Flash()->hasData('new_registration')) {
+        if (Oforge()->View()->Flash()->hasData('new_registration')) {
             $newRegistration = Oforge()->View()->Flash()->getData('new_registration');
             Oforge()->View()->assign($newRegistration);
             Oforge()->View()->Flash()->clearData('new_registration');
@@ -126,7 +128,9 @@ class AccountController extends SecureFrontendController {
         /**
          * invalid token was sent
          */
-        if (!hash_equals($_SESSION['token'], $body['token'])) {
+        /** @var TokenService $tokenService */
+        $tokenService = Oforge()->Services()->get('token');
+        if (!$tokenService->isValid($token)) {
             Oforge()->View()->Flash()->addMessage('warning', I18N::translate('form_invalid_token', 'The data has been sent from an invalid form.'));
             Oforge()->Logger()->get()->addWarning('Someone tried to change the password without a valid form csrf token! Redirecting back to login.');
 
@@ -168,9 +172,14 @@ class AccountController extends SecureFrontendController {
 
             return $response->withRedirect($uri, 302);
         }
+        try {
+            $newPassword = $passwordService->validateFormat($newPassword)->hash($newPassword);
+        } catch (InvalidPasswordFormatException $exception) {
+            Oforge()->View()->Flash()->addMessage('error', $exception->getMessage());
 
-        $newPassword = $passwordService->hash($newPassword);
-        $user        = $passwordResetService->changePassword($guid, $newPassword);
+            return $response->withRedirect($uri, 302);
+        }
+        $user = $passwordResetService->changePassword($guid, $newPassword);
 
         /*
          * User not found

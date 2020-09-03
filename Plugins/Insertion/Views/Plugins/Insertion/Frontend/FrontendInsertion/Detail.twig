@@ -1,6 +1,6 @@
 {% extends "@parent/Frontend/Layout.twig" %}
 
-{% block title %}{% set title = insertion.content[0].title ~ i18n('title_separator', {en: ' | ', de: ' | '}) ~ i18n(insertion.insertionType.name) %}{{ title|length > 35 ? title|slice(0, 35) : title }}{{ i18n('title_separator', {en: ' | ', de: ' | '}) }}{{ config('system_project_name') }}{% endblock title %}
+{% block title %}{% set title = insertion.content[0].title ~ i18n('title_separator', {en: ' | ', de: ' | '}) ~ i18n(insertion.insertionType.name) %}{{ title }}{% endblock title %}
 
 {% block description %}{% set description = insertion.content[0].description %}{{ description|length > 255 ? description|slice(0, 220) : description }}{{ i18n('title_separator', {en: ' | ', de: ' | '}) }}{{ config('system_project_name') }}{% endblock description %}
 
@@ -48,7 +48,13 @@
                         <div class="product-view--heading">
                             <h3 class="title title--3 title--product">{{ insertion.content[0].title }}</h3>
                             <span
-                                class="title title--3 product-view__price">{{ i18n('price_' ~ insertion.insertionType.name, i18n('price')) }}
+                                class="title title--3 product-view__price">
+                                {% if insertion.priceType is same as('auction') %}
+                                    {{ i18n('price_auction') }}
+                                {% else %}
+                                    {{ i18n('price_' ~ insertion.insertionType.name, i18n('price')) }}
+                                {% endif %}
+
                                 {% if insertion.priceType is same as("on_demand") %}
                                     <span class="attribute-value">{{ i18n('price_on_demand') }}</span>
                                 {% elseif  item.priceType == "price_range" %}
@@ -79,8 +85,13 @@
                         {% endfor %}
 
                         <div class="product__attribute">
-                        <span
-                            class="attribute-label">{{ i18n('price_' ~ insertion.insertionType.name, i18n('price')) }}</span>
+                        <span class="attribute-label">
+                            {% if insertion.priceType is same as('auction') %}
+                                {{ i18n('price_auction') }}
+                            {% else %}
+                                {{ i18n('price_' ~ insertion.insertionType.name, i18n('price')) }}
+                            {% endif %}
+                        </span>
                             {% if insertion.priceType is same as("on_demand") %}
                                 <span class="attribute-value">{{ i18n('price_on_demand') }}</span>
                             {% elseif  insertion.priceType is same as("price_range") %}

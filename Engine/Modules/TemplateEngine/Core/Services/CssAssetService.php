@@ -4,7 +4,7 @@ namespace Oforge\Engine\Modules\TemplateEngine\Core\Services;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use Leafo\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\Compiler;
 use MatthiasMullie\Minify\CSS;
 use Oforge\Engine\Modules\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Modules\Core\Exceptions\Template\TemplateNotFoundException;
@@ -107,11 +107,11 @@ class CssAssetService extends BaseAssetService {
         if(!$sourceMap) {
             $minifier = new CSS($outputFull . ".css");
             $minifier->minify($outputFull . ".min.css");
-            $this->store->set($this->getAccessKey($scope), $output . ".min.css");
+            $this->storage->set($this->getAccessKey($scope), $output . ".min.css");
             return $output . ".min.css";
         }
 
-        $this->store->set($this->getAccessKey($scope), $output . ".css");
+        $this->storage->set($this->getAccessKey($scope), $output . ".css");
         return $output . ".css";
     }
 }

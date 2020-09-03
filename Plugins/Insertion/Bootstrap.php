@@ -4,13 +4,12 @@ namespace Insertion;
 
 use FrontendUserManagement\Middleware\FrontendSecureMiddleware;
 use FrontendUserManagement\Services\AccountNavigationService;
-use Insertion\Controller\Backend\BackendInsertionFeedbackController;
-use Insertion\Controller\Backend\BackendInsertionSeoContentController;
-use Insertion\Models\InsertionSeoContent;
 use Insertion\Commands\ReminderCommand;
 use Insertion\Commands\SearchBookmarkCommand;
 use Insertion\Controller\Backend\BackendAttributeController;
 use Insertion\Controller\Backend\BackendInsertionController;
+use Insertion\Controller\Backend\BackendInsertionFeedbackController;
+use Insertion\Controller\Backend\BackendInsertionSeoContentController;
 use Insertion\Controller\Backend\BackendInsertionTypeController;
 use Insertion\Controller\Backend\BackendInsertionTypeGroupController;
 use Insertion\Controller\Frontend\FrontendInsertionController;
@@ -19,8 +18,8 @@ use Insertion\Cronjobs\Reminder14DaysCronjob;
 use Insertion\Cronjobs\Reminder30DaysCronjob;
 use Insertion\Cronjobs\Reminder3DaysCronjob;
 use Insertion\Cronjobs\SearchBookmarkCronjob;
-use Insertion\Middleware\InsertionProfileProgressMiddleware;
 use Insertion\Middleware\InsertionDetailMiddleware;
+use Insertion\Middleware\InsertionProfileProgressMiddleware;
 use Insertion\Models\AttributeKey;
 use Insertion\Models\AttributeValue;
 use Insertion\Models\Insertion;
@@ -30,6 +29,7 @@ use Insertion\Models\InsertionContent;
 use Insertion\Models\InsertionFeedback;
 use Insertion\Models\InsertionMedia;
 use Insertion\Models\InsertionProfile;
+use Insertion\Models\InsertionSeoContent;
 use Insertion\Models\InsertionType;
 use Insertion\Models\InsertionTypeAttribute;
 use Insertion\Models\InsertionTypeGroup;
@@ -58,6 +58,9 @@ use Oforge\Engine\Modules\AdminBackend\Core\Enums\DashboardWidgetPosition;
 use Oforge\Engine\Modules\AdminBackend\Core\Services\BackendNavigationService;
 use Oforge\Engine\Modules\AdminBackend\Core\Services\DashboardWidgetsService;
 use Oforge\Engine\Modules\Core\Abstracts\AbstractBootstrap;
+use Oforge\Engine\Modules\Core\Models\Config\ConfigType;
+use Oforge\Engine\Modules\Core\Services\ConfigService;
+use Oforge\Engine\Modules\I18n\Helper\I18N;
 use Oforge\Engine\Modules\TemplateEngine\Core\Services\TemplateRenderService;
 
 class Bootstrap extends AbstractBootstrap {
@@ -69,6 +72,7 @@ class Bootstrap extends AbstractBootstrap {
         $this->endpoints = [
             FrontendInsertionController::class,
             FrontendUsersInsertionController::class,
+            Controller\Frontend\InsertionProvidersController::class,
             BackendAttributeController::class,
             BackendInsertionController::class,
             BackendInsertionTypeController::class,
@@ -123,7 +127,9 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->dependencies = [
+            \CMS\Bootstrap::class,
             \FrontendUserManagement\Bootstrap::class,
+            \ImageUpload\Bootstrap::class,
             \Messenger\Bootstrap::class,
             \Helpdesk\Bootstrap::class,
             \VideoUpload\Bootstrap::class,
@@ -208,14 +214,49 @@ class Bootstrap extends AbstractBootstrap {
             'position' => DashboardWidgetPosition::TOP,
             'cssClass' => 'bg-green',
         ]);
+
+        I18N::translate('config_group_insertions', [
+            'en' => 'Insertions',
+            'de' => 'Inserate',
+        ]);
+        I18N::translate('config_insertions_creation_moderator_mail', [
+            'en' => 'Insertion creation reviewer: Mail',
+            'de' => 'Inseratserstellungsprüfer: Mail',
+        ]);
+        I18N::translate('config_insertions_creation_moderator_name', [
+            'en' => 'Insertion creation reviewer: Name',
+            'de' => 'Inseratserstellungsprüfer: Name',
+        ]);
+        /** @var ConfigService $configService */
+        $configService = Oforge()->Services()->get('config');
+        $configService->add([
+            'name'     => 'insertions_creation_moderator_mail',
+            'type'     => ConfigType::STRING,
+            'group'    => 'insertions',
+            'default'  => '',
+            'label'    => 'config_insertions_creation_moderator_mail',
+            'required' => true,
+        ]);
+        $configService->add([
+            'name'     => 'insertions_creation_moderator_name',
+            'type'     => ConfigType::STRING,
+            'group'    => 'insertions',
+            'default'  => '',
+            'label'    => 'config_insertions_creation_moderator_name',
+            'required' => true,
+        ]);
     }
 
-    public function uninstall() {
-        /** @var DashboardWidgetsService $dashboardWidgetsService */
-        $dashboardWidgetsService = Oforge()->Services()->get('backend.dashboard.widgets');
-        $dashboardWidgetsService->uninstall('plugin_insertion_count');
-        $dashboardWidgetsService->uninstall('plugin_insertion_moderation');
-        $dashboardWidgetsService->uninstall('plugin_insertion_feedback');
+
+    /** @inheritDoc */
+    public function uninstall(bool $keepData) {
+        if (!$keepData) {
+            /** @var DashboardWidgetsService $dashboardWidgetsService */
+            $dashboardWidgetsService = Oforge()->Services()->get('backend.dashboard.widgets');
+            $dashboardWidgetsService->uninstall('plugin_insertion_count');
+            $dashboardWidgetsService->uninstall('plugin_insertion_moderation');
+            $dashboardWidgetsService->uninstall('plugin_insertion_feedback');
+        }
     }
 
     public function deactivate() {

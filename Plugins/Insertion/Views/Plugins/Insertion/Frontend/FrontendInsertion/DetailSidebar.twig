@@ -5,7 +5,7 @@
         {% block sidebar__panel_provider %}
             {% if profile is defined %}
                 <div class="panel panel--provider">
-                    <h3 class="provider_title">{{ i18n('insertion_detail_provider_headline') }}</h3>
+                    <h3 class="provider_title">{{ i18n('insertion_detail_provider_headline_' ~ insertion.insertionType.name) }}</h3>
                     <div class="provider_image-container">
 
                         <div class="user__picture"
@@ -48,6 +48,10 @@
             {% endif %}
                 <a href="{{ url("insertions_contact", {id: insertion.id}) }}"
                    class="button button--secondary">{{ i18n('insertion_detail_contact_advertiser', 'Anbieter Kontaktieren') }}</a>
+                {% if insertion.priceType is same as("auction") %}
+                    <a href="{{ insertion.auctionUrl }}"
+                       class="button button--secondary">{{ i18n('insertion_auction_button', 'Zur Auktion') }}</a>
+                {% endif %}
                 <a href="{{ url('frontend_account_insertions_toggleBookmark', {insertionId: insertion.id }) }}"
                    class="button button--secondary">{% if hasBookmark(insertion.id) %} {{ i18n('insertion_detail_contact_remove_from_wishlist', 'Aus meinem Stall entfernen') }} {% else %}{{ i18n('insertion_detail_contact_add_to_wishlist', 'In meinen Stall stellen') }}{% endif %}</a>
             </div>
