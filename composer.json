@@ -1,10 +1,10 @@
 {
     "require": {
         "php": ">=7.2",
-        "ext-imagick": "*",
         "ext-curl": "*",
-        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-xml": "*",
         "slim/slim": "^3.0",
@@ -19,9 +19,6 @@
         "ulrichsg/getopt-php": "^3.0",
         "marcj/topsort": "^1.1",
         "pelago/emogrifier": "^2.1.0",
-        "ext-fileinfo": "*",
-        "vimeo/vimeo-api": "^3.0",
-        "google/cloud-translate": "*",
         "wikimedia/composer-merge-plugin": "*"
     },
     "repositories": [

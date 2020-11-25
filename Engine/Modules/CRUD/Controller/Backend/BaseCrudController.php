@@ -65,15 +65,15 @@ class BaseCrudController extends SecureBackendController {
      *              'multiple' => false,   // If type = select. (Optional)
      *              'editor' => [       // Configuration for field editor.
      *                  'hint'          => 'i18n-translated-text'| ['key' => 'label_id', 'default' => 'ID'],     // Hint text (in index colum header and under editor field).(Optional)
+     *                  'placeholder'   => '...',   // i18n-translated-text. (Optional)
      *                  'default'       => '',      // Default value. (Optional)
      *                  'custom'        => '...'    // If type = custom. Twig path for include.
      *                  'required'      => false,   // (Optional)
-     *                  'pattern'       => '...',   // If type = string. (Optional)
-     *                  'placeholder'   => '...',   // i18n-translated-text. (Optional)
+     *                  'pattern'       => '...',   // If type = string|text. (Optional)
      *                  'maxlength'     => ...,     // If type = string|text. (Optional)
-     *                  'min'           => '...',   // If type = int|float|currency. (Optional)
-     *                  'max"           => ...,     // If type = string|text. (Optional)
-     *                  'step"          => ...,     // If type = string|text. (Optional)
+     *                  'min'           => '...',   // If type = int|float. (Optional)
+     *                  'max'           => ...,     // If type = int|float. (Optional)
+     *                  'step'          => ...,     // If type = int|float. (Optional)
      *                  'size'          => ...,     // If type = select. (Optional)
      *              ],
      *              'renderer' => [ // Configuration for renderer
@@ -148,7 +148,7 @@ class BaseCrudController extends SecureBackendController {
      */
     protected $indexOrderBy = [];
     /**
-     * Configuration of the orderBy query keys on the index view.
+     * Query params keys for ordering and pagination. Map "internal context key" => "query param key".
      *      protected $indexOrderByQueryKeys = [
      *          'orderBy'         => 'orderBy',
      *          'order'           => 'order',
@@ -156,7 +156,7 @@ class BaseCrudController extends SecureBackendController {
      *          'entitiesPerPage' => 'entitiesPerPage',
      *      ];
      *
-     * @var array $indexOrderBy
+     * @var array $indexReservedQueryParamKeys
      */
     protected $indexReservedQueryKeys = [
         'orderBy'         => 'orderBy',
